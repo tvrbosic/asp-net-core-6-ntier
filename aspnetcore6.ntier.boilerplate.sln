@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspnetcore6.ntier.API", "aspnetcore6.ntier.API\aspnetcore6.ntier.API.csproj", "{FF12C835-9A92-4135-BDFB-9CF5DFEC8BD4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore6.ntier.API", "aspnetcore6.ntier.API\aspnetcore6.ntier.API.csproj", "{FF12C835-9A92-4135-BDFB-9CF5DFEC8BD4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2D3EF979-FBF7-4449-9227-B265F5D1B730} = {2D3EF979-FBF7-4449-9227-B265F5D1B730}
+		{7BFAB208-E401-4EBA-B673-81530A10D86C} = {7BFAB208-E401-4EBA-B673-81530A10D86C}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspnetcore6.ntier.DAL", "aspnetcore6.ntier.DAL\aspnetcore6.ntier.DAL.csproj", "{7BFAB208-E401-4EBA-B673-81530A10D86C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore6.ntier.DAL", "aspnetcore6.ntier.DAL\aspnetcore6.ntier.DAL.csproj", "{7BFAB208-E401-4EBA-B673-81530A10D86C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspnetcore6.ntier.BLL", "aspnetcore6.ntier.BLL\aspnetcore6.ntier.BLL.csproj", "{2D3EF979-FBF7-4449-9227-B265F5D1B730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore6.ntier.BLL", "aspnetcore6.ntier.BLL\aspnetcore6.ntier.BLL.csproj", "{2D3EF979-FBF7-4449-9227-B265F5D1B730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
