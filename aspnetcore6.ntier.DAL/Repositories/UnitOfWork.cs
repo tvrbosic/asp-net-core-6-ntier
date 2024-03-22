@@ -1,19 +1,18 @@
 ﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace aspnetcore6.ntier.DAL.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DbContext _context;
+        private readonly ApiDbContext _context;
 
-        public IRepository<Department> DepartmentsRepository { get; }
+        public IRepository<Department> Departments { get; }
 
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(ApiDbContext context)
         {
             _context = context;
-            DepartmentsRepository = new Repository<Department>(context);
+            Departments = new Repository<Department>(context);
         }
 
         public async Task<int> CompleteAsync()
@@ -23,7 +22,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _context.Dispose();
         }
     }
 

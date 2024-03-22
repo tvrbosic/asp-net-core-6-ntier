@@ -4,7 +4,7 @@ namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<Department> DepartmentsRepository { get; }
+        IRepository<Department> Departments { get; }
 
         Task<int> CompleteAsync();
     }
