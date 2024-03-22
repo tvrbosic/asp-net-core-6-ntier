@@ -1,22 +1,83 @@
+using aspnetcore6.ntier.BLL.Utilities;
+using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+using aspnetcore6.ntier.DAL.Repositories;
+using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
-// Add services to the container.
-builder.Services.AddControllers();
 
-#region Database context
-builder.Services.AddDbContext<ApiDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ApiDb")));
+#region Database context configuration
+builder.Services.AddDbContext<ApiDbContext>(options => {
+    if (builder.Environment.IsDevelopment())
+    {
+        options.UseSqlServer(configuration.GetConnectionString("ApiDb"))
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors();
+    }
+    else
+    {
+        options.UseSqlServer(configuration.GetConnectionString("ApiDb"));
+    }
+});
 #endregion
 
+#region Serilog configuration
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Logging.AddSerilog(logger);
+#endregion
+
+#region Default services
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+#endregion
+
+#region Application services registration
+// Repositories
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Services
+// TODO
+
+// Utility
+builder.Services.AddScoped<IDataSeed, DataSeed>();
+#endregion
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+#region Seed data based on environment
+using (var scope = app.Services.CreateScope())
+{
+    var dataSeed = scope.ServiceProvider.GetRequiredService<IDataSeed>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        await dataSeed.DevelopmentDataSeed();
+    }
+    else if (app.Environment.IsEnvironment("Test"))
+    {
+        await dataSeed.TestDataSeed();
+    }
+    else if (app.Environment.IsEnvironment("Uat"))
+    {
+        await dataSeed.UatDataSeed();
+    }
+    else if (app.Environment.IsProduction())
+    {
+        await dataSeed.ProductionDataSeed();
+    }
+}
+#endregion
+
+#region Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -30,3 +91,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+#endregion
