@@ -1,4 +1,4 @@
-﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
+﻿using aspnetcore6.ntier.DAL.Models.General;
 
 namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
 {
