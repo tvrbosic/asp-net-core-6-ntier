@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
+using aspnetcore6.ntier.DAL.Models.Abstract;
 
 public class ApiDbContext : DbContext
 {
@@ -22,7 +23,27 @@ public class ApiDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        #region General entitiy configuration
+        #region Base entity configuration
+        modelBuilder.Entity<Department>(entity =>
+        {
+            entity
+                .HasOne<User>(b => b.CreatedBy)
+                .WithMany()
+                .HasForeignKey(b => b.CreatedById);
+
+            entity
+                .HasOne<User>(b => b.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(b => b.UpdatedById);
+
+            entity
+                .HasOne<User>(b => b.DeletedBy)
+                .WithMany()
+                .HasForeignKey(b => b.DeletedById);
+        });
+        #endregion
+
+            #region General entitiy configuration
         modelBuilder.Entity<Department>(entity =>
         {
             entity

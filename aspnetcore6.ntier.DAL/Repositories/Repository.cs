@@ -33,7 +33,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public TEntity Add(TEntity entity)
         {
-            entity.CreatedAt = DateTime.UtcNow;
+            entity.DateCreated = DateTime.UtcNow;
             _dbSet.Add(entity);
             return entity;
         }
@@ -42,14 +42,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
         {
             foreach (var entity in entities)
             {
-                entity.CreatedAt = DateTime.UtcNow;
+                entity.DateCreated = DateTime.UtcNow;
             }
             _dbSet.AddRange(entities);
         }
 
         public void Update(TEntity entity)
         {
-            entity.UpdatedAt = DateTime.UtcNow;
+            entity.DateUpdated = DateTime.UtcNow;
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
         }
@@ -60,7 +60,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             if (entity != null)
             {
                 entity.IsDeleted = true;
-                entity.UpdatedAt = DateTime.UtcNow;
+                entity.DateDeleted = DateTime.UtcNow;
                 _context.Entry(entity).State = EntityState.Modified;
             }
         }

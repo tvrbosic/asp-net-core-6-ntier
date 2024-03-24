@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
+﻿#nullable enable
+using aspnetcore6.ntier.DAL.Models.AccessControl;
 
 namespace aspnetcore6.ntier.DAL.Models.Abstract
 {
@@ -6,8 +7,11 @@ namespace aspnetcore6.ntier.DAL.Models.Abstract
     {
         public BaseEntity()
         {
+            CreatedById = null;
             DateCreated = DateTime.UtcNow;
+            UpdatedById = null;
             DateUpdated = null;
+            DeletedById = null;
             DateDeleted = null;
             IsDeleted = false;
         }
@@ -19,14 +23,14 @@ namespace aspnetcore6.ntier.DAL.Models.Abstract
         public bool IsDeleted { get; set; }
 
         #region Navigation
-        public int CreatedById { get; set; }
-        public User CreatedBy { get; set; }
+        public int? CreatedById { get; set; }
+        public User? CreatedBy { get; set; }
 
-        public int UpdatedById { get; set; }
-        public User UpdatedBy { get; set; }
+        public int? UpdatedById { get; set; }
+        public User? UpdatedBy { get; set; }
 
-        public int DeletedById { get; set; }
-        public User DeletedBy { get; set; }
+        public int? DeletedById { get; set; }
+        public User? DeletedBy { get; set; }
         #endregion
     }
 }

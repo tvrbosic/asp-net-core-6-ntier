@@ -1,8 +1,7 @@
 ﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
+using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace aspnetcore6.ntier.BLL.Utilities
 {
@@ -72,7 +71,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
 
         #endregion
 
-        #region Specific entitiy seed methods (private)
+        #region General entitiy seed methods (private)
         private void SeedDepartments()
         {
             // Seed only if none exists
@@ -96,6 +95,35 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     var newDepartment = new Department { Name = name };
                     _unitOfWork.Departments.Add(newDepartment);
                 }
+            }
+        }
+        #endregion
+
+        #region Access control entity seed methods (private)
+        private void SeedPermissions()
+        {
+            // Seed only if none exists
+            if (!_unitOfWork.Permissions.GetAll().Any())
+            {
+                // TODO
+            }
+        }
+
+        private void SeedRoles()
+        {
+            // Seed only if none exists
+            if (!_unitOfWork.Roles.GetAll().Any())
+            {
+                // TODO
+            }
+        }
+
+        private void SeedUsers()
+        {
+            // Seed only if none exists
+            if (!_unitOfWork.Users.GetAll().Any())
+            {
+                // TODO
             }
         }
         #endregion
