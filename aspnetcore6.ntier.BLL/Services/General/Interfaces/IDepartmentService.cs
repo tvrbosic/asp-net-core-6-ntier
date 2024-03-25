@@ -9,5 +9,9 @@ namespace aspnetcore6.ntier.BLL.Services.General.Interfaces
         Task<DepartmentDTO> GetDepartment(int id);
 
         Task<bool> AddDepartment(AddDepartmentDTO department);
+
+        Task<bool> UpdateDepartment(UpdateDepartmentDTO department);
+
+        Task<bool> DeleteDepartment(int id);
     }
 }

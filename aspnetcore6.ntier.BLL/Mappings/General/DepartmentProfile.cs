@@ -10,6 +10,7 @@ namespace aspnetcore6.ntier.BLL.Mappings.General
         {
             CreateMap<Department, DepartmentDTO>();
             CreateMap<AddDepartmentDTO, Department>();
+            CreateMap<UpdateDepartmentDTO, Department>();
         }
     }
 }

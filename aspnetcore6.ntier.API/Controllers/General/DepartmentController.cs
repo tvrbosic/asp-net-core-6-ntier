@@ -35,5 +35,17 @@ namespace aspnetcore6.ntier.API.Controllers.General
         {
             return await _departmentService.AddDepartment(departmentDTO) ? Ok() : BadRequest();
         }
+
+        [HttpPut]
+        public async Task<IActionResult> PutDepartment(UpdateDepartmentDTO departmentDTO)
+        {
+            return await _departmentService.UpdateDepartment(departmentDTO) ? Ok() : BadRequest();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDepartment(int id)
+        {
+            return await _departmentService.DeleteDepartment(id) ? Ok() : BadRequest();
+        }
     }
 }

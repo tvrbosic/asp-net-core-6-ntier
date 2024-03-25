@@ -45,5 +45,34 @@ namespace aspnetcore6.ntier.BLL.Services.General
                 return false;
             }
         }
+
+        public async Task<bool> UpdateDepartment(UpdateDepartmentDTO departmentDTO)
+        {
+            try
+            {
+                Department department = _mapper.Map<Department>(departmentDTO);
+                _unitOfWork.Departments.Update(department);
+                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log error
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteDepartment(int id)
+        {
+            try
+            {
+                await _unitOfWork.Departments.Delete(id);
+                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log error
+                return false;
+            }
+        }
     }
 }

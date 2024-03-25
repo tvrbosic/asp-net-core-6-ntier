@@ -7,11 +7,11 @@ namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
     {
         Task<TEntity> GetById(int id);
         Task<IEnumerable<TEntity>> GetAll();
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
+        Task AddRange(IEnumerable<TEntity> entities);
         void Update(TEntity entity);
-        void Delete(int id);
+        Task Delete(int id);
         void HardDelete(int id);
     }
 }

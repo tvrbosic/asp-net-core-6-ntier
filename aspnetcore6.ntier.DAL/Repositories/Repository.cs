@@ -26,9 +26,9 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return _dbSet.AsNoTracking().Where(predicate).ToList();
+            return await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
         }
 
         public async Task<TEntity> Add(TEntity entity)
@@ -38,13 +38,13 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return entity;
         }
 
-        public void AddRange(IEnumerable<TEntity> entities)
+        public async Task AddRange(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
                 entity.DateCreated = DateTime.UtcNow;
             }
-            _dbSet.AddRange(entities);
+            await _dbSet.AddRangeAsync(entities);
         }
 
         public void Update(TEntity entity)
@@ -54,7 +54,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public async void Delete(int id)
+        public async Task Delete(int id)
         {
             var entity = await GetById(id);
             if (entity != null)
