@@ -23,13 +23,13 @@ namespace aspnetcore6.ntier.BLL.Utilities
             try
             {
                 #region General entity
-                SeedDepartments();
+                await SeedDepartments();
                 #endregion
 
                 #region Access control entity
-                SeedPermissions();
-                SeedRoles();
-                SeedUsers();
+                await SeedPermissions();
+                await SeedRoles();
+                await SeedUsers();
                 #endregion
 
                 await _unitOfWork.CompleteAsync();
@@ -44,7 +44,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             try
             {
-                SeedDepartments();
+                await SeedDepartments();
                 await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
@@ -57,7 +57,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             try
             {
-                SeedDepartments();
+                await SeedDepartments();
                 await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             try
             {
-                SeedDepartments();
+                await SeedDepartments();
                 await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
@@ -82,10 +82,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
         #endregion
 
         #region General entitiy seed methods (private)
-        private void SeedDepartments()
+        private async Task SeedDepartments()
         {
+            IEnumerable<Department> departments = await _unitOfWork.Departments.GetAll();
             // Seed only if none exists
-            if (!_unitOfWork.Departments.GetAll().Any())
+            if (!departments.Any())
             {
                 string[] departmentNames = {
                     "Administrator",
@@ -111,10 +112,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
         #endregion
 
         #region Access control entity seed methods (private)
-        private void SeedPermissions()
+        private async Task SeedPermissions()
         {
+            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.GetAll();
             // Seed only if none exists
-            if (!_unitOfWork.Permissions.GetAll().Any())
+            if (!permissions.Any())
             {
                 List<Permission> permissionsToSeed = new List<Permission>()
                 {
@@ -164,10 +166,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
             }
         }
 
-        private void SeedRoles()
+        private async Task SeedRoles()
         {
+            IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
             // Seed only if none exists
-            if (!_unitOfWork.Roles.GetAll().Any())
+            if (!roles.Any())
             {
                 List<Role> rolesToSeed = new List<Role>()
                 {
@@ -213,10 +216,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
             }
         }
 
-        private void SeedUsers()
+        private async Task SeedUsers()
         {
+            IEnumerable<User> users = await _unitOfWork.Users.GetAll();
             // Seed only if none exists
-            if (!_unitOfWork.Users.GetAll().Any())
+            if (!users.Any())
             {
                 List<User> usersToSeed = new List<User>()
                 {

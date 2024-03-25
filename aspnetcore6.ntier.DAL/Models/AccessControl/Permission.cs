@@ -13,6 +13,5 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
 
         public ICollection<Role> Roles { get; set; }
         #endregion
-
     }
 }

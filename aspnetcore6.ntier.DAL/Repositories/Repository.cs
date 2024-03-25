@@ -16,14 +16,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public TEntity GetById(int id)
+        public async Task<TEntity> GetById(int id)
         {
-            return _dbSet.AsNoTracking().FirstOrDefault(e => e.Id == id);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public async Task<IEnumerable<TEntity>> GetAll()
         {
-            return _dbSet.AsNoTracking().ToList();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
@@ -31,10 +31,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return _dbSet.AsNoTracking().Where(predicate).ToList();
         }
 
-        public TEntity Add(TEntity entity)
+        public async Task<TEntity> Add(TEntity entity)
         {
             entity.DateCreated = DateTime.UtcNow;
-            _dbSet.Add(entity);
+            await _dbSet.AddAsync(entity);
             return entity;
         }
 
@@ -54,9 +54,9 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var entity = GetById(id);
+            var entity = await GetById(id);
             if (entity != null)
             {
                 entity.IsDeleted = true;
