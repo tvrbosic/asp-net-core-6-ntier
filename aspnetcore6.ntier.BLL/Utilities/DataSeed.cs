@@ -1,8 +1,11 @@
-﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace aspnetcore6.ntier.BLL.Utilities
 {
@@ -169,6 +172,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
         private async Task SeedRoles()
         {
             IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
+
+            // Fetch permissions from the database based on the provided PermissionIds
+            List<int> PermissionIds = new List<int>() { 2, 3, 5, 7 };
+            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.Find(p => PermissionIds.Contains(p.Id));
+
             // Seed only if none exists
             if (!roles.Any())
             {
@@ -177,40 +185,48 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     new Role
                     {
                         Name = "Super Administrator",
-                        DepartmentId = 1
+                        DepartmentId = 1,
+                        Permissions = new List<Permission>(permissions)
                     },
                     new Role
                     {
                         Name = "Administrator",
-                        DepartmentId = 2
+                        DepartmentId = 2,
+                        Permissions = new List<Permission>(permissions)
                     },
                     new Role
                     {
                         Name = "User",
-                        DepartmentId = 2
+                        DepartmentId = 2,
+                        Permissions = new List<Permission>(permissions)
                     },
                     new Role
                     {
                         Name = "Guest",
-                        DepartmentId = 2
+                        DepartmentId = 2,
+                        Permissions = new List<Permission>(permissions)
                     }
                     ,
                     new Role
                     {
                         Name = "Administrator",
-                        DepartmentId = 3
+                        DepartmentId = 3,
+                        Permissions = new List<Permission>(permissions)
                     },
                     new Role
                     {
                         Name = "User",
-                        DepartmentId = 3
+                        DepartmentId = 3,
+                        Permissions = new List<Permission>(permissions)
                     },
                     new Role
                     {
                         Name = "Guest",
-                        DepartmentId = 3
+                        DepartmentId = 3,
+                        Permissions = new List<Permission>(permissions)
                     }
                 };
+
 
                 await _unitOfWork.Roles.AddRange(rolesToSeed);
             }

@@ -8,9 +8,21 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
     {
         public AccessControlProfile()
         {
+            // Permission
             CreateMap<Permission, PermissionDTO>();
             CreateMap<AddPermissionDTO, Permission>();
             CreateMap<UpdatePermissionDTO, Permission>();
+
+            // Role
+            CreateMap<Role, RoleDTO>();
+            CreateMap<AddRoleDTO, Role>();
+            CreateMap<UpdateRoleDTO, Role>();
+
+            // User
+            //CreateMap<User, UserDTO>();
+            //CreateMap<AddUserDTO, User>();
+            //CreateMap<UpdateUserDTO, User>();
+
         }
     }
 }
