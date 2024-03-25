@@ -105,7 +105,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 foreach (string name in departmentNames)
                 {
                     var newDepartment = new Department { Name = name };
-                    _unitOfWork.Departments.Add(newDepartment);
+                    await _unitOfWork.Departments.Add(newDepartment);
                 }
             }
         }
@@ -162,7 +162,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     }
                 };
 
-                _unitOfWork.Permissions.AddRange(permissionsToSeed);
+                await _unitOfWork.Permissions.AddRange(permissionsToSeed);
             }
         }
 
@@ -212,7 +212,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     }
                 };
 
-                _unitOfWork.Roles.AddRange(rolesToSeed);
+                await _unitOfWork.Roles.AddRange(rolesToSeed);
             }
         }
 
@@ -306,7 +306,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     }
                 };
 
-                _unitOfWork.Users.AddRange(usersToSeed);
+                await _unitOfWork.Users.AddRange(usersToSeed);
             }
         }
         #endregion

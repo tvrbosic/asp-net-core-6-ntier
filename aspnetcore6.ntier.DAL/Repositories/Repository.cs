@@ -16,20 +16,44 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<TEntity> GetById(int id)
-        {
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
-        }
+
 
         public async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<TEntity> GetById(int id)
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsNoTracking().AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
             return await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
         }
+
+
 
         public async Task<TEntity> Add(TEntity entity)
         {

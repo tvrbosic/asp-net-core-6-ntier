@@ -1,3 +1,5 @@
+using aspnetcore6.ntier.BLL.Services.AccessControl;
+using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
 using aspnetcore6.ntier.BLL.Services.General;
 using aspnetcore6.ntier.BLL.Services.General.Interfaces;
 using aspnetcore6.ntier.BLL.Utilities;
@@ -48,6 +50,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Services
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 // Utility
 builder.Services.AddScoped<IDataSeed, DataSeed>();

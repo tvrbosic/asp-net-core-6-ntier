@@ -1,6 +1,5 @@
 ﻿using aspnetcore6.ntier.BLL.Services.General.DTOs;
 using aspnetcore6.ntier.BLL.Services.General.Interfaces;
-using aspnetcore6.ntier.DAL.Models.General;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.General
