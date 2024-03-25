@@ -2,6 +2,8 @@
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Abstract;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Data;
 
 public class ApiDbContext : DbContext
 {
@@ -13,37 +15,23 @@ public class ApiDbContext : DbContext
     #endregion
 
     #region Access control entity registration
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<User> Users { get; set; }
     #endregion
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         #region Base entity configuration
-        modelBuilder.Entity<Department>(entity =>
-        {
-            entity
-                .HasOne<User>(b => b.CreatedBy)
-                .WithMany()
-                .HasForeignKey(b => b.CreatedById);
-
-            entity
-                .HasOne<User>(b => b.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(b => b.UpdatedById);
-
-            entity
-                .HasOne<User>(b => b.DeletedBy)
-                .WithMany()
-                .HasForeignKey(b => b.DeletedById);
-        });
+        new BaseEntityConfiguration<Department>().Configure(modelBuilder.Entity<Department>());
+        new BaseEntityConfiguration<Permission>().Configure(modelBuilder.Entity<Permission>());
+        new BaseEntityConfiguration<Role>().Configure(modelBuilder.Entity<Role>());
+        new BaseEntityConfiguration<User>().Configure(modelBuilder.Entity<User>());
         #endregion
 
-            #region General entitiy configuration
+        #region General entitiy configuration
         modelBuilder.Entity<Department>(entity =>
         {
             entity
@@ -72,7 +60,11 @@ public class ApiDbContext : DbContext
             entity
                 .HasMany(u => u.Roles)
                 .WithMany(r => r.Users)
-                .UsingEntity(j => j.ToTable("UserRole"));
+                .UsingEntity(
+                    "RoleUser",
+                    l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
+                    r => r.HasOne(typeof(User)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(User.Id)),
+                    j => j.HasKey("RoleId", "UserId"));
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -81,15 +73,24 @@ public class ApiDbContext : DbContext
                 .HasOne(r => r.Department)
                 .WithMany(d => d.Roles)
                 .HasForeignKey(r => r.DepartmentId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
             entity
                 .HasMany(r => r.Users)
                 .WithMany(u => u.Roles)
-                .UsingEntity(j => j.ToTable("UserRole"));
+                .UsingEntity(
+                    "RoleUser",
+                    l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
+                    r => r.HasOne(typeof(User)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(User.Id)),
+                    j => j.HasKey("RoleId", "UserId"));
             entity
                 .HasMany(r => r.Permissions)
                 .WithMany(p => p.Roles)
-                .UsingEntity(j => j.ToTable("RolePermission"));
+                .UsingEntity(
+                    "PermissionRole",
+                    l => l.HasOne(typeof(Permission)).WithMany().HasForeignKey("PermissionId").HasPrincipalKey(nameof(Permission.Id)),
+                    r => r.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
+                    j => j.HasKey("PermissionId", "RoleId"));
         });
 
         modelBuilder.Entity<Permission>(entity =>
@@ -102,7 +103,11 @@ public class ApiDbContext : DbContext
             entity
                 .HasMany(p => p.Roles)
                 .WithMany(r => r.Permissions)
-                .UsingEntity(j => j.ToTable("RolePermission"));
+                .UsingEntity(
+                    "PermissionRole",
+                    l => l.HasOne(typeof(Permission)).WithMany().HasForeignKey("PermissionId").HasPrincipalKey(nameof(Permission.Id)),
+                    r => r.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
+                    j => j.HasKey("PermissionId", "RoleId"));
         });
         #endregion
 
@@ -112,5 +117,27 @@ public class ApiDbContext : DbContext
         modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
+
+        
+    }
+}
+
+
+public class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseEntity
+{
+    public void Configure(EntityTypeBuilder<T> builder)
+    {
+        builder
+            .HasOne(b => b.CreatedBy)
+            .WithMany()
+            .HasForeignKey(b => b.CreatedById);
+        builder
+            .HasOne(b => b.UpdatedBy)
+            .WithMany()
+            .HasForeignKey(b => b.UpdatedById);
+        builder
+            .HasOne(b => b.DeletedBy)
+            .WithMany()
+            .HasForeignKey(b => b.DeletedById);
     }
 }
