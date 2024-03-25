@@ -53,6 +53,16 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
         }
 
+        public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.AsNoTracking().Where(predicate).ToListAsync();
+        }
+
 
 
         public async Task<TEntity> Add(TEntity entity)
