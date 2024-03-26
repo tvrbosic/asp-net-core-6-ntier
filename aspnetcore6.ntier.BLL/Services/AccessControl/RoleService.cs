@@ -54,7 +54,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                 Role roleToUpdate = await _unitOfWork.Roles.GetByIdIncluding(roleDTO.Id, r => r.Permissions);
                 _mapper.Map(roleDTO, roleToUpdate);
                 
-                await _unitOfWork.Roles.Update(roleToUpdate, roleDTO.PermissionIds.ToList());
+                _unitOfWork.Roles.Update(roleToUpdate, roleDTO.PermissionIds.ToList());
                 return await _unitOfWork.CompleteAsync() > 0 ? true : false;
             }
             catch (Exception ex)

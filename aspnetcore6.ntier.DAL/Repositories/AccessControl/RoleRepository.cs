@@ -1,6 +1,5 @@
 ﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Repositories.AccessControl.Interfaces;
-using System.Linq;
 
 namespace aspnetcore6.ntier.DAL.Repositories.AccessControl
 {
@@ -42,7 +41,7 @@ namespace aspnetcore6.ntier.DAL.Repositories.AccessControl
 
         public async Task Delete(int id)
         {
-            // TODO
+            this.find
         }
     }
 }
