@@ -37,7 +37,13 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             {
                 Role role = _mapper.Map<Role>(roleDTO);
 
-                await _unitOfWork.Roles.AddWithRoles(role, roleDTO.PermissionIds.ToList());
+                foreach (int permissionId in roleDTO.PermissionIds)
+                {
+                    Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                    role.Permissions.Add(permissionToAdd);
+                }
+
+                await _unitOfWork.Roles.Add(role);
                 return await _unitOfWork.CompleteAsync() > 0 ? true : false;
             }
             catch (Exception ex)
@@ -53,8 +59,16 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             {
                 Role roleToUpdate = await _unitOfWork.Roles.GetByIdIncluding(roleDTO.Id, r => r.Permissions);
                 _mapper.Map(roleDTO, roleToUpdate);
-                
-                _unitOfWork.Roles.Update(roleToUpdate, roleDTO.PermissionIds.ToList());
+
+                // Clear previously given permissions
+                roleToUpdate.Permissions.Clear();
+
+                foreach (int permissionId in roleDTO.PermissionIds)
+                {
+                    Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                    roleToUpdate.Permissions.Add(permissionToAdd);
+                }
+                _unitOfWork.Roles.Update(roleToUpdate);
                 return await _unitOfWork.CompleteAsync() > 0 ? true : false;
             }
             catch (Exception ex)

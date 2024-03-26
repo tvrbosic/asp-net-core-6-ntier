@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
@@ -179,58 +180,52 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     {
                         Name = "Super Administrator",
                         DepartmentId = 1,
-                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Administrator",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "User",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Guest",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>()
                     }
                     ,
                     new Role
                     {
                         Name = "Administrator",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "User",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Guest",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>()
                     }
                 };
 
                 Random random = new Random();
                 foreach (Role role in rolesToSeed)
                 {
-                    List<int> randomPermissionIds = new List<int>();
-                    // Generate 3 random integers that will represent permission ids
+                    // Get permissions from database with random id to mock data
                     for (int i = 0; i < 3; i++)
                     {
-                        randomPermissionIds.Add(random.Next(1, permissions.Count() + 1));
+                        var randomId = random.Next(1, permissions.Count() + 1);
+                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(randomId);
+                        role.Permissions.Add(permissionToAdd);
                     }
 
-                    await _unitOfWork.Roles.AddWithRoles(role, randomPermissionIds);
+                    await _unitOfWork.Roles.Add(role);
                 }
                 await _unitOfWork.CompleteAsync();
             }

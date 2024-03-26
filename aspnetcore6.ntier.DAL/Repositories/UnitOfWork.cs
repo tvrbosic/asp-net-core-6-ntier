@@ -1,7 +1,5 @@
 ﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Repositories.AccessControl;
-using aspnetcore6.ntier.DAL.Repositories.AccessControl.Interfaces;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 
 namespace aspnetcore6.ntier.DAL.Repositories
@@ -16,7 +14,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         #region Access control entity registration
         public IRepository<User> Users{ get; }
-        public IRoleRepository Roles { get; }
+        public IRepository<Role> Roles { get; }
         public IRepository<Permission> Permissions { get; }
         #endregion
 
@@ -25,7 +23,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _context = context;
             Departments = new Repository<Department>(context);
             Users = new Repository<User>(context);
-            Roles = new RoleRepository(context);
+            Roles = new Repository<Role>(context);
             Permissions = new Repository<Permission>(context);
         }
 
