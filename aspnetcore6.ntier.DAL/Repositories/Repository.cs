@@ -16,6 +16,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
+        public IQueryable<TEntity> Queryable()
+        {
+            return _dbSet;
+        }
+
         public async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
@@ -24,11 +29,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var query = _dbSet.AsNoTracking().AsQueryable();
-            foreach (var include in includes)
+            foreach (var includeProperty in includes)
             {
-                query = query.AsNoTracking().Include(include);
+                query = query.Include(includeProperty);
             }
             return await query.AsNoTracking().ToListAsync();
+
         }
 
         public async Task<TEntity> GetById(int id)

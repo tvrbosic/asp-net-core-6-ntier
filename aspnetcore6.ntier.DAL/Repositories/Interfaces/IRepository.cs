@@ -5,6 +5,7 @@ namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
 {
     public interface IRepository<TEntity> where TEntity : BaseEntity
     {
+        IQueryable<TEntity> Queryable();
         Task<IEnumerable<TEntity>> GetAll();
         Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes);
         Task<TEntity> GetById(int id);

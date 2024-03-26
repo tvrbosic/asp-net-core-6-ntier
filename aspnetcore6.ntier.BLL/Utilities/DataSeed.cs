@@ -3,7 +3,9 @@ using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace aspnetcore6.ntier.BLL.Utilities
 {
@@ -75,7 +77,6 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 _logger.LogError(ex.Message);
             }
         }
-
         #endregion
 
         #region General entitiy seed methods (private)
@@ -165,67 +166,46 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 await _unitOfWork.CompleteAsync();
             }
         }
-
+        
         private async Task SeedRoles()
         {
             IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
-            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.GetAll();
 
             // Seed only if none exists
             if (!roles.Any())
             {
-                List<Role> rolesToSeed = new List<Role>()
-                {
-                    new Role
-                    {
-                        Name = "Super Administrator",
-                        DepartmentId = 1,
-                    },
-                    new Role
-                    {
-                        Name = "Administrator",
-                        DepartmentId = 2,
-                    },
-                    new Role
-                    {
-                        Name = "User",
-                        DepartmentId = 2,
-                    },
-                    new Role
-                    {
-                        Name = "Guest",
-                        DepartmentId = 2,
-                    }
-                    ,
-                    new Role
-                    {
-                        Name = "Administrator",
-                        DepartmentId = 3,
-                    },
-                    new Role
-                    {
-                        Name = "User",
-                        DepartmentId = 3,
-                    },
-                    new Role
-                    {
-                        Name = "Guest",
-                        DepartmentId = 3,
-                    }
+                IEnumerable<Department> departments = await _unitOfWork.Departments.GetAll();
+                Random random = new Random();
+
+                string[] roleNames = {
+                    "Super Administrator",
+                    "Administrator",
+                    "User",
+                    "Guest",
+                    "Administrator",
+                    "User",
+                    "Guest",
                 };
 
-                Random random = new Random();
-                foreach (Role role in rolesToSeed)
+                foreach (string roleName in roleNames)
                 {
-                    // Get permissions from database with random id to mock data
-                    for (int i = 0; i < 3; i++)
+                    Role addRole = new Role()
                     {
-                        var randomId = random.Next(1, permissions.Count() + 1);
-                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(randomId);
-                        role.Permissions.Add(permissionToAdd);
+                        Name = roleName,
+                        DepartmentId = random.Next(1, departments.Count() + 1)
+                    };
+                
+                    for (int i = 1; i < 4; i++)
+                    {
+                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(i);
+                        addRole.PermissionsLink.Add(new PermissionRoleLink
+                        {
+                            Role = addRole,
+                            Permission = permissionToAdd
+                        });
                     }
 
-                    await _unitOfWork.Roles.Add(role);
+                    await _unitOfWork.Roles.Add(addRole);
                 }
                 await _unitOfWork.CompleteAsync();
             }

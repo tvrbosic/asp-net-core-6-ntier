@@ -17,6 +17,7 @@ public class ApiDbContext : DbContext
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<PermissionRoleLink> PermissionRoleLinks { get; set; }
     #endregion
 
 
@@ -28,6 +29,7 @@ public class ApiDbContext : DbContext
         new BaseEntityConfiguration<Permission>().Configure(modelBuilder.Entity<Permission>());
         new BaseEntityConfiguration<Role>().Configure(modelBuilder.Entity<Role>());
         new BaseEntityConfiguration<User>().Configure(modelBuilder.Entity<User>());
+        new BaseEntityConfiguration<PermissionRoleLink>().Configure(modelBuilder.Entity<PermissionRoleLink>());
         #endregion
 
         #region General entitiy configuration
@@ -82,14 +84,6 @@ public class ApiDbContext : DbContext
                     l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
                     r => r.HasOne(typeof(User)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(User.Id)),
                     j => j.HasKey("RoleId", "UserId"));
-            entity
-                .HasMany(r => r.Permissions)
-                .WithMany(p => p.Roles)
-                .UsingEntity(
-                    "PermissionRole",
-                    l => l.HasOne(typeof(Permission)).WithMany().HasForeignKey("PermissionId").HasPrincipalKey(nameof(Permission.Id)),
-                    r => r.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
-                    j => j.HasKey("PermissionId", "RoleId"));
         });
 
         modelBuilder.Entity<Permission>(entity =>
@@ -99,15 +93,13 @@ public class ApiDbContext : DbContext
                 .WithMany(d => d.Permissions)
                 .HasForeignKey(p => p.DepartmentId)
                 .IsRequired();
-            entity
-                .HasMany(p => p.Roles)
-                .WithMany(r => r.Permissions)
-                .UsingEntity(
-                    "PermissionRole",
-                    l => l.HasOne(typeof(Permission)).WithMany().HasForeignKey("PermissionId").HasPrincipalKey(nameof(Permission.Id)),
-                    r => r.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
-                    j => j.HasKey("PermissionId", "RoleId"));
         });
+
+        modelBuilder.Entity<PermissionRoleLink>(entity =>
+        {
+            entity.HasKey(x => new { x.PermissionId, x.RoleId, x.IsDeleted });
+        });
+                
         #endregion
 
         #region Soft delete entity filter registration
@@ -115,6 +107,7 @@ public class ApiDbContext : DbContext
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
+        modelBuilder.Entity<PermissionRoleLink>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
 
         

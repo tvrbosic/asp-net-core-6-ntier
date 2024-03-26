@@ -15,7 +15,8 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
 
             // Role
             CreateMap<Role, Role>();
-            CreateMap<Role, RoleDTO>();
+            CreateMap<Role, RoleDTO>()
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionsLink.Select(pl => pl.Permission)));
             CreateMap<AddRoleDTO, Role>();
             CreateMap<UpdateRoleDTO, Role>();
 
