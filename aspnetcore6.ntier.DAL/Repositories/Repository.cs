@@ -16,8 +16,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-
-
         public async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
@@ -25,22 +23,22 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
-            var query = _dbSet.AsQueryable();
+            var query = _dbSet.AsNoTracking().AsQueryable();
             foreach (var include in includes)
             {
-                query = query.Include(include);
+                query = query.AsNoTracking().Include(include);
             }
-            return await query.ToListAsync();
+            return await query.AsNoTracking().ToListAsync();
         }
 
         public async Task<TEntity> GetById(int id)
         {
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
         {
-            var query = _dbSet.AsNoTracking().AsQueryable();
+            var query = _dbSet.AsQueryable();
             foreach (var include in includes)
             {
                 query = query.Include(include);
@@ -50,7 +48,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
         public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
@@ -60,9 +58,8 @@ namespace aspnetcore6.ntier.DAL.Repositories
             {
                 query = query.Include(include);
             }
-            return await query.AsNoTracking().Where(predicate).ToListAsync();
+            return await query.Where(predicate).ToListAsync();
         }
-
 
 
         public async Task Add(TEntity entity)
@@ -87,7 +84,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public async Task Delete(int id)
+        public virtual async Task Delete(int id)
         {
             var entity = await GetById(id);
             if (entity != null)
