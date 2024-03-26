@@ -1,3 +1,7 @@
+using aspnetcore6.ntier.BLL.Services.AccessControl;
+using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
+using aspnetcore6.ntier.BLL.Services.General;
+using aspnetcore6.ntier.BLL.Services.General.Interfaces;
 using aspnetcore6.ntier.BLL.Utilities;
 using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Repositories;
@@ -32,11 +36,12 @@ var logger = new LoggerConfiguration()
 builder.Logging.AddSerilog(logger);
 #endregion
 
-#region Default services
+#region ASP.NET and third party services
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 #endregion
 
 #region Application services registration
@@ -44,7 +49,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Services
-// TODO
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Utility
 builder.Services.AddScoped<IDataSeed, DataSeed>();

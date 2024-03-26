@@ -7,60 +7,90 @@ namespace aspnetcore6.ntier.DAL.Repositories
 {
    public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
-        private readonly DbContext _context;
+        private readonly ApiDbContext _context;
         private readonly DbSet<TEntity> _dbSet;
 
-        public Repository(DbContext context)
+        public Repository(ApiDbContext context)
         {
             _context = context;
             _dbSet = context.Set<TEntity>();
         }
 
-        public TEntity GetById(int id)
+        public async Task<IEnumerable<TEntity>> GetAll()
         {
-            return _dbSet.AsNoTracking().FirstOrDefault(e => e.Id == id);
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
-            return _dbSet.AsNoTracking().ToList();
+            var query = _dbSet.AsNoTracking().AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.AsNoTracking().Include(include);
+            }
+            return await query.AsNoTracking().ToListAsync();
         }
 
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity> GetById(int id)
         {
-            return _dbSet.AsNoTracking().Where(predicate).ToList();
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public TEntity Add(TEntity entity)
+        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
         {
-            entity.CreatedAt = DateTime.UtcNow;
-            _dbSet.Add(entity);
-            return entity;
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public void AddRange(IEnumerable<TEntity> entities)
+        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.Where(predicate).ToListAsync();
+        }
+
+
+        public async Task Add(TEntity entity)
+        {
+            entity.DateCreated = DateTime.UtcNow;
+            await _dbSet.AddAsync(entity);
+        }
+
+        public async Task AddRange(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
-                entity.CreatedAt = DateTime.UtcNow;
+                entity.DateCreated = DateTime.UtcNow;
             }
-            _dbSet.AddRange(entities);
+            await _dbSet.AddRangeAsync(entities);
         }
 
-        public void Update(TEntity entity)
+        public virtual void Update(TEntity entity)
         {
-            entity.UpdatedAt = DateTime.UtcNow;
+            entity.DateUpdated = DateTime.UtcNow;
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public void Delete(int id)
+        public virtual async Task Delete(int id)
         {
-            var entity = GetById(id);
+            var entity = await GetById(id);
             if (entity != null)
             {
                 entity.IsDeleted = true;
-                entity.UpdatedAt = DateTime.UtcNow;
+                entity.DateDeleted = DateTime.UtcNow;
                 _context.Entry(entity).State = EntityState.Modified;
             }
         }
