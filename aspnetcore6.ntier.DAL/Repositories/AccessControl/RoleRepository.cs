@@ -25,9 +25,9 @@ namespace aspnetcore6.ntier.DAL.Repositories.AccessControl
             await _context.Roles.AddAsync(role);
         }
 
-        public async  Task Update(Role role, List<int> permissionIds)
+        public void Update(Role role, List<int> permissionIds)
         {
-            // Clear             
+            // Clear previously given permissions
             role.Permissions.Clear();
 
 
