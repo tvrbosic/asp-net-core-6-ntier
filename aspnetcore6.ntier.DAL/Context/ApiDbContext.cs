@@ -3,7 +3,6 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Data;
 
 public class ApiDbContext : DbContext
 {

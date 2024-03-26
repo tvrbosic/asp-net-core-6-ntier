@@ -1,7 +1,5 @@
 ﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
 using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.AccessControl
@@ -36,13 +34,6 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         {
             return await _roleService.AddRole(roleDTO) ? Ok() : BadRequest();
         }
-
-        [HttpPost("test")]
-        public async Task<IActionResult> PostTestRole(AddRoleDTO roleDTO)
-        {
-            return await _roleService.AddRole(roleDTO) ? Ok() : BadRequest();
-        }
-
 
         [HttpPut]
         public async Task<IActionResult> PutRole(UpdateRoleDTO roleDTO)

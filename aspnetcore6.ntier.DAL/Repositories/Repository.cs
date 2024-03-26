@@ -7,10 +7,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
 {
    public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
-        private readonly DbContext _context;
+        private readonly ApiDbContext _context;
         private readonly DbSet<TEntity> _dbSet;
 
-        public Repository(DbContext context)
+        public Repository(ApiDbContext context)
         {
             _context = context;
             _dbSet = context.Set<TEntity>();
@@ -65,11 +65,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
 
 
-        public async Task<TEntity> Add(TEntity entity)
+        public async Task Add(TEntity entity)
         {
             entity.DateCreated = DateTime.UtcNow;
             await _dbSet.AddAsync(entity);
-            return entity;
         }
 
         public async Task AddRange(IEnumerable<TEntity> entities)
@@ -81,7 +80,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             await _dbSet.AddRangeAsync(entities);
         }
 
-        public void Update(TEntity entity)
+        public virtual void Update(TEntity entity)
         {
             entity.DateUpdated = DateTime.UtcNow;
             _dbSet.Attach(entity);

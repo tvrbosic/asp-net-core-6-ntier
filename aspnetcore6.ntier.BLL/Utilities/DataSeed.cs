@@ -1,11 +1,8 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Data;
 
 namespace aspnetcore6.ntier.BLL.Utilities
 {
@@ -35,7 +32,6 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 await SeedUsers();
                 #endregion
 
-                await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
             {
@@ -48,7 +44,6 @@ namespace aspnetcore6.ntier.BLL.Utilities
             try
             {
                 await SeedDepartments();
-                await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
             {
@@ -61,7 +56,6 @@ namespace aspnetcore6.ntier.BLL.Utilities
             try
             {
                 await SeedDepartments();
-                await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
             {
@@ -74,7 +68,6 @@ namespace aspnetcore6.ntier.BLL.Utilities
             try
             {
                 await SeedDepartments();
-                await _unitOfWork.CompleteAsync();
             }
             catch (Exception ex)
             {
@@ -110,6 +103,8 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     var newDepartment = new Department { Name = name };
                     await _unitOfWork.Departments.Add(newDepartment);
                 }
+
+                await _unitOfWork.CompleteAsync();
             }
         }
         #endregion
@@ -166,16 +161,14 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 };
 
                 await _unitOfWork.Permissions.AddRange(permissionsToSeed);
+                await _unitOfWork.CompleteAsync();
             }
         }
 
         private async Task SeedRoles()
         {
             IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
-
-            // Fetch permissions from the database based on the provided PermissionIds
-            List<int> PermissionIds = new List<int>() { 2, 3, 5, 7 };
-            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.Find(p => PermissionIds.Contains(p.Id));
+            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.GetAll();
 
             // Seed only if none exists
             if (!roles.Any())
@@ -186,49 +179,60 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     {
                         Name = "Super Administrator",
                         DepartmentId = 1,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Administrator",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "User",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Guest",
                         DepartmentId = 2,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     }
                     ,
                     new Role
                     {
                         Name = "Administrator",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "User",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     },
                     new Role
                     {
                         Name = "Guest",
                         DepartmentId = 3,
-                        Permissions = new List<Permission>(permissions)
+                        Permissions = new List<Permission>()
                     }
                 };
 
+                Random random = new Random();
+                foreach (Role role in rolesToSeed)
+                {
+                    List<int> randomPermissionIds = new List<int>();
+                    // Generate 3 random integers that will represent permission ids
+                    for (int i = 0; i < 3; i++)
+                    {
+                        randomPermissionIds.Add(random.Next(1, permissions.Count() + 1));
+                    }
 
-                await _unitOfWork.Roles.AddRange(rolesToSeed);
+                    await _unitOfWork.Roles.AddWithRoles(role, randomPermissionIds);
+                }
+                await _unitOfWork.CompleteAsync();
             }
         }
 
@@ -323,6 +327,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 };
 
                 await _unitOfWork.Users.AddRange(usersToSeed);
+                await _unitOfWork.CompleteAsync();
             }
         }
         #endregion
