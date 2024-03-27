@@ -3,6 +3,7 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 public class ApiDbContext : DbContext
 {
@@ -18,6 +19,7 @@ public class ApiDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<PermissionRoleLink> PermissionRoleLinks { get; set; }
+    public DbSet<RoleUserLink> RoleUserLinks { get; set; }
     #endregion
 
 
@@ -30,6 +32,7 @@ public class ApiDbContext : DbContext
         new BaseEntityConfiguration<Role>().Configure(modelBuilder.Entity<Role>());
         new BaseEntityConfiguration<User>().Configure(modelBuilder.Entity<User>());
         new BaseEntityConfiguration<PermissionRoleLink>().Configure(modelBuilder.Entity<PermissionRoleLink>());
+        new BaseEntityConfiguration<RoleUserLink>().Configure(modelBuilder.Entity<RoleUserLink>());
         #endregion
 
         #region General entitiy configuration
@@ -58,14 +61,6 @@ public class ApiDbContext : DbContext
                 .WithMany(d => d.Users)
                 .HasForeignKey(u => u.DepartmentId)
                 .IsRequired();
-            entity
-                .HasMany(u => u.Roles)
-                .WithMany(r => r.Users)
-                .UsingEntity(
-                    "RoleUser",
-                    l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
-                    r => r.HasOne(typeof(User)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(User.Id)),
-                    j => j.HasKey("RoleId", "UserId"));
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -76,14 +71,6 @@ public class ApiDbContext : DbContext
                 .HasForeignKey(r => r.DepartmentId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-            entity
-                .HasMany(r => r.Users)
-                .WithMany(u => u.Roles)
-                .UsingEntity(
-                    "RoleUser",
-                    l => l.HasOne(typeof(Role)).WithMany().HasForeignKey("RoleId").HasPrincipalKey(nameof(Role.Id)),
-                    r => r.HasOne(typeof(User)).WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(User.Id)),
-                    j => j.HasKey("RoleId", "UserId"));
         });
 
         modelBuilder.Entity<Permission>(entity =>
@@ -97,9 +84,14 @@ public class ApiDbContext : DbContext
 
         modelBuilder.Entity<PermissionRoleLink>(entity =>
         {
-            entity.HasKey(x => new { x.PermissionId, x.RoleId, x.IsDeleted });
+            entity.HasKey(pl => pl.Id);
         });
-                
+
+        modelBuilder.Entity<RoleUserLink>(entity =>
+        {
+            entity.HasKey(ru => ru.Id);
+        });
+
         #endregion
 
         #region Soft delete entity filter registration
@@ -108,10 +100,96 @@ public class ApiDbContext : DbContext
         modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
         modelBuilder.Entity<PermissionRoleLink>().HasQueryFilter(p => !p.IsDeleted);
+        modelBuilder.Entity<RoleUserLink>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
-
-        
     }
+
+    // =======================================| IMPORTANT |======================================= //
+    #region Global context configuration and method overrides
+    public override int SaveChanges()
+    {
+        ProcessChangetrackerEntries();
+        //HandleAuditProperties();
+        //HandleAudit();
+
+        return base.SaveChanges();
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ProcessChangetrackerEntries();
+        //HandleAuditProperties();
+        //HandleAudit();
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void ProcessChangetrackerEntries()
+    {
+        // Get entities from database context which are extended from BaseEntitiy class prior to executing database query
+        var modifiedEntries = this.ChangeTracker.Entries().Where(e => e.Entity is BaseEntity);
+
+        // Update BaseEntity properties according to entity state 
+        foreach (var entry in modifiedEntries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Property("CreatedById").CurrentValue = null; // TODO: Application user ID is null currently to be able to do initial fill. Replace with user ID from HTTP request.
+                    entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
+                    break;
+                case EntityState.Modified:
+                    entry.Property("UpdatedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
+                    break;
+                case EntityState.Deleted:
+                    entry.Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    entry.Property("DateDeleted").CurrentValue = DateTime.UtcNow;
+                    entry.Property("IsDeleted").CurrentValue = true;
+                    entry.State = EntityState.Modified;
+                    // Cascade soft delete navigation properties
+                    HandleCascadeSoftDelete(entry);
+                    break;
+            }
+        }
+    }
+
+    private void HandleCascadeSoftDelete(EntityEntry entry)
+    {
+        foreach (var navigationEntry in entry.Navigations)
+        {
+            if (navigationEntry is CollectionEntry collectionEntry)
+            {
+                if(!navigationEntry.IsLoaded) navigationEntry.Load();
+                foreach (var dependentEntry in collectionEntry.CurrentValue)
+                {
+                    Entry(dependentEntry).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    Entry(dependentEntry).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
+                    Entry(dependentEntry).Property("IsDeleted").CurrentValue = true;
+                    Entry(dependentEntry).State = EntityState.Modified;
+                }
+            }
+            else
+            {
+                var dependentEntry = navigationEntry.CurrentValue;
+                if (dependentEntry != null)
+                {
+                    Entry(dependentEntry).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    Entry(dependentEntry).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
+                    Entry(dependentEntry).Property("IsDeleted").CurrentValue = true;
+                    Entry(dependentEntry).State = EntityState.Modified;
+                }
+            }
+
+        }
+    }
+
+    private void HandleAudit()
+    {
+        // TODO
+    }
+    #endregion
+
 }
 
 

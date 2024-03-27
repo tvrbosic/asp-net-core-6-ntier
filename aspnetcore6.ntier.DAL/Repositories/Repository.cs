@@ -76,16 +76,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task AddRange(IEnumerable<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                entity.DateCreated = DateTime.UtcNow;
-            }
             await _dbSet.AddRangeAsync(entities);
         }
 
         public virtual void Update(TEntity entity)
         {
-            entity.DateUpdated = DateTime.UtcNow;
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
         }
@@ -95,18 +90,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             var entity = await GetById(id);
             if (entity != null)
             {
-                entity.IsDeleted = true;
-                entity.DateDeleted = DateTime.UtcNow;
-                _context.Entry(entity).State = EntityState.Modified;
-            }
-        }
-
-        public void HardDelete(int id)
-        {
-            var entity = _dbSet.Find(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
+                _context.Remove(entity);
             }
         }
     }

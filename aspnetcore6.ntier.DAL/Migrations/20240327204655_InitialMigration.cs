@@ -5,43 +5,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace aspnetcore6.ntier.DAL.Migrations
 {
-    public partial class InitialAccessControl : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "UpdatedAt",
-                table: "Departments",
-                newName: "DateUpdated");
-
-            migrationBuilder.RenameColumn(
-                name: "CreatedAt",
-                table: "Departments",
-                newName: "DateCreated");
-
-            migrationBuilder.AddColumn<int>(
-                name: "CreatedById",
-                table: "Departments",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "DateDeleted",
-                table: "Departments",
-                type: "datetime2",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "DeletedById",
-                table: "Departments",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "UpdatedById",
-                table: "Departments",
-                type: "int",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true),
+                    DeletedById = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Users",
@@ -173,47 +159,95 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PermissionRole",
+                name: "PermissionRoleLinks",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PermissionId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true),
+                    DeletedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PermissionRole", x => new { x.PermissionId, x.RoleId });
+                    table.PrimaryKey("PK_PermissionRoleLinks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PermissionRole_Permissions_PermissionId",
+                        name: "FK_PermissionRoleLinks_Permissions_PermissionId",
                         column: x => x.PermissionId,
                         principalTable: "Permissions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PermissionRole_Roles_RoleId",
+                        name: "FK_PermissionRoleLinks_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PermissionRoleLinks_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PermissionRoleLinks_Users_DeletedById",
+                        column: x => x.DeletedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PermissionRoleLinks_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoleUser",
+                name: "RoleUserLinks",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true),
+                    DeletedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoleUser", x => new { x.RoleId, x.UserId });
+                    table.PrimaryKey("PK_RoleUserLinks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RoleUser_Roles_RoleId",
+                        name: "FK_RoleUserLinks_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RoleUser_Users_UserId",
+                        name: "FK_RoleUserLinks_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RoleUserLinks_Users_DeletedById",
+                        column: x => x.DeletedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RoleUserLinks_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RoleUserLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -236,9 +270,29 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PermissionRole_RoleId",
-                table: "PermissionRole",
+                name: "IX_PermissionRoleLinks_CreatedById",
+                table: "PermissionRoleLinks",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionRoleLinks_DeletedById",
+                table: "PermissionRoleLinks",
+                column: "DeletedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionRoleLinks_PermissionId",
+                table: "PermissionRoleLinks",
+                column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionRoleLinks_RoleId",
+                table: "PermissionRoleLinks",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionRoleLinks_UpdatedById",
+                table: "PermissionRoleLinks",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_CreatedById",
@@ -281,8 +335,28 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoleUser_UserId",
-                table: "RoleUser",
+                name: "IX_RoleUserLinks_CreatedById",
+                table: "RoleUserLinks",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleUserLinks_DeletedById",
+                table: "RoleUserLinks",
+                column: "DeletedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleUserLinks_RoleId",
+                table: "RoleUserLinks",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleUserLinks_UpdatedById",
+                table: "RoleUserLinks",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleUserLinks_UserId",
+                table: "RoleUserLinks",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -342,10 +416,10 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 table: "Departments");
 
             migrationBuilder.DropTable(
-                name: "PermissionRole");
+                name: "PermissionRoleLinks");
 
             migrationBuilder.DropTable(
-                name: "RoleUser");
+                name: "RoleUserLinks");
 
             migrationBuilder.DropTable(
                 name: "Permissions");
@@ -356,43 +430,8 @@ namespace aspnetcore6.ntier.DAL.Migrations
             migrationBuilder.DropTable(
                 name: "Users");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Departments_CreatedById",
-                table: "Departments");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Departments_DeletedById",
-                table: "Departments");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Departments_UpdatedById",
-                table: "Departments");
-
-            migrationBuilder.DropColumn(
-                name: "CreatedById",
-                table: "Departments");
-
-            migrationBuilder.DropColumn(
-                name: "DateDeleted",
-                table: "Departments");
-
-            migrationBuilder.DropColumn(
-                name: "DeletedById",
-                table: "Departments");
-
-            migrationBuilder.DropColumn(
-                name: "UpdatedById",
-                table: "Departments");
-
-            migrationBuilder.RenameColumn(
-                name: "DateUpdated",
-                table: "Departments",
-                newName: "UpdatedAt");
-
-            migrationBuilder.RenameColumn(
-                name: "DateCreated",
-                table: "Departments",
-                newName: "CreatedAt");
+            migrationBuilder.DropTable(
+                name: "Departments");
         }
     }
 }

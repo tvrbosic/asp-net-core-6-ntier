@@ -16,6 +16,5 @@ namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
         Task AddRange(IEnumerable<TEntity> entities);
         void Update(TEntity entity);
         Task Delete(int id);
-        void HardDelete(int id);
     }
 }
