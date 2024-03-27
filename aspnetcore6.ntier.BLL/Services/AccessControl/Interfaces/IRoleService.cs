@@ -6,7 +6,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces
     {
         Task<IEnumerable<RoleDTO>> GetRoles();
 
-        Task<RoleDTO> GetRole(int id);
+        RoleDTO GetRole(int id);
 
         Task<bool> AddRole(AddRoleDTO role);
 

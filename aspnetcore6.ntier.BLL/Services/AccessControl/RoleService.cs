@@ -22,15 +22,21 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         {
             IEnumerable<Role> roles = await _unitOfWork.Roles
                 .Queryable()
-                .Include(p => p.PermissionsLink)
+                .Include(r => r.Department)
+                .Include(r => r.PermissionsLink)
                 .ThenInclude(pl => pl.Permission).ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }
 
-        public async Task<RoleDTO> GetRole(int id)
+        public RoleDTO GetRole(int id)
         {
-            Role role = await _unitOfWork.Roles.GetByIdIncluding(id, p => p.Department, p => p.PermissionsLink.Select(pl => pl.Permission));
+            Role role = _unitOfWork.Roles
+                .Queryable()
+                .Include(r => r.Department)
+                .Include(r => r.PermissionsLink)
+                .ThenInclude(pl => pl.Permission)
+                .Single(r => r.Id == id);
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }
@@ -65,7 +71,14 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         {
             try
             {
-                Role updateRole = await _unitOfWork.Roles.GetByIdIncluding(roleDTO.Id, r => r.PermissionsLink.Select(pl => pl.Permission));
+                Role updateRole = _unitOfWork.Roles
+                    .Queryable()
+                    .Include(r => r.Department)
+                    .Include(r => r.PermissionsLink)
+                    .ThenInclude(pl => pl.Permission)
+                    .Single(r => r.Id == roleDTO.Id);
+
+
                 _mapper.Map(roleDTO, updateRole);
 
                 // Clear previously given permissions
