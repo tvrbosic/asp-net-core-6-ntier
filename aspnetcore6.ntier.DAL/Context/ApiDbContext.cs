@@ -92,7 +92,11 @@ public class ApiDbContext : DbContext
 
         #endregion
 
-        #region Soft delete entity filter registration
+        #region Query filters
+        // =======================================| SUPERUSER |======================================= //
+        modelBuilder.Entity<User>().HasQueryFilter(u => u.UserName == "SUPERUSER");
+
+        // =======================================| SOFT DELETE |======================================= //
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
@@ -107,7 +111,6 @@ public class ApiDbContext : DbContext
     public override int SaveChanges()
     {
         ProcessChangetrackerEntries();
-        //HandleAuditProperties();
         //HandleAudit();
 
         return base.SaveChanges();
@@ -116,7 +119,6 @@ public class ApiDbContext : DbContext
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         ProcessChangetrackerEntries();
-        //HandleAuditProperties();
         //HandleAudit();
 
         return await base.SaveChangesAsync(cancellationToken);
