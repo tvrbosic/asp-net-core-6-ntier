@@ -8,6 +8,7 @@ namespace aspnetcore6.ntier.DAL.Models.Abstract
         public BaseEntity()
         {
             CreatedById = null;
+            AuditKey = Guid.NewGuid();
             DateCreated = DateTime.UtcNow;
             UpdatedById = null;
             DateUpdated = null;
@@ -17,6 +18,7 @@ namespace aspnetcore6.ntier.DAL.Models.Abstract
         }
 
         public int Id { get; set; }
+        public Guid AuditKey { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated{ get; set; }
         public DateTime? DateDeleted{ get; set; }
