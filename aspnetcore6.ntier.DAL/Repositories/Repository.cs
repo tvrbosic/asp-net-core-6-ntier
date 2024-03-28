@@ -70,7 +70,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task Add(TEntity entity)
         {
-            entity.DateCreated = DateTime.UtcNow;
             await _dbSet.AddAsync(entity);
         }
 
