@@ -1,6 +1,5 @@
 ﻿using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
-using System.Text.Json.Serialization;
 
 namespace aspnetcore6.ntier.DAL.Models.General
 {

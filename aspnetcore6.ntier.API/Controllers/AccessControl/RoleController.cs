@@ -23,9 +23,9 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoleDTO>> GetRole(int id)
+        public ActionResult<RoleDTO> GetRole(int id)
         {
-            RoleDTO role = await _roleService.GetRole(id);
+            RoleDTO role = _roleService.GetRole(id);
             return role == null ? NotFound() : Ok(role);
         }
 

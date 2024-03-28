@@ -16,6 +16,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
+        public IQueryable<TEntity> Queryable()
+        {
+            return _dbSet;
+        }
+
         public async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
@@ -24,11 +29,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var query = _dbSet.AsNoTracking().AsQueryable();
-            foreach (var include in includes)
+            foreach (var includeProperty in includes)
             {
-                query = query.AsNoTracking().Include(include);
+                query = query.Include(includeProperty);
             }
             return await query.AsNoTracking().ToListAsync();
+
         }
 
         public async Task<TEntity> GetById(int id)
@@ -64,22 +70,16 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task Add(TEntity entity)
         {
-            entity.DateCreated = DateTime.UtcNow;
             await _dbSet.AddAsync(entity);
         }
 
         public async Task AddRange(IEnumerable<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                entity.DateCreated = DateTime.UtcNow;
-            }
             await _dbSet.AddRangeAsync(entities);
         }
 
         public virtual void Update(TEntity entity)
         {
-            entity.DateUpdated = DateTime.UtcNow;
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
         }
@@ -89,18 +89,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             var entity = await GetById(id);
             if (entity != null)
             {
-                entity.IsDeleted = true;
-                entity.DateDeleted = DateTime.UtcNow;
-                _context.Entry(entity).State = EntityState.Modified;
-            }
-        }
-
-        public void HardDelete(int id)
-        {
-            var entity = _dbSet.Find(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
+                _context.Remove(entity);
             }
         }
     }

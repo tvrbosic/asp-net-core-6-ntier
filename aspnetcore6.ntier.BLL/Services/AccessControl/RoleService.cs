@@ -3,6 +3,7 @@ using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace aspnetcore6.ntier.BLL.Services.AccessControl
 {
@@ -19,14 +20,23 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<IEnumerable<RoleDTO>> GetRoles()
         {
-            IEnumerable<Role> roles = await _unitOfWork.Roles.GetAllIncluding(p => p.Department, p => p.Permissions);
+            IEnumerable<Role> roles = await _unitOfWork.Roles
+                .Queryable()
+                .Include(r => r.Department)
+                .Include(r => r.PermissionsLink)
+                .ThenInclude(pl => pl.Permission).ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }
 
-        public async Task<RoleDTO> GetRole(int id)
+        public RoleDTO GetRole(int id)
         {
-            Role role = await _unitOfWork.Roles.GetByIdIncluding(id, p => p.Department, p => p.Permissions);
+            Role role = _unitOfWork.Roles
+                .Queryable()
+                .Include(r => r.Department)
+                .Include(r => r.PermissionsLink)
+                .ThenInclude(pl => pl.Permission)
+                .Single(r => r.Id == id);
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }
@@ -35,15 +45,19 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         {
             try
             {
-                Role role = _mapper.Map<Role>(roleDTO);
+                Role addRole = _mapper.Map<Role>(roleDTO);
 
                 foreach (int permissionId in roleDTO.PermissionIds)
                 {
                     Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                    role.Permissions.Add(permissionToAdd);
+                    addRole.PermissionsLink.Add(new PermissionRoleLink
+                    {
+                        Role = addRole,
+                        Permission = permissionToAdd
+                    });
                 }
 
-                await _unitOfWork.Roles.Add(role);
+                await _unitOfWork.Roles.Add(addRole);
                 return await _unitOfWork.CompleteAsync() > 0 ? true : false;
             }
             catch (Exception ex)
@@ -57,18 +71,29 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         {
             try
             {
-                Role roleToUpdate = await _unitOfWork.Roles.GetByIdIncluding(roleDTO.Id, r => r.Permissions);
-                _mapper.Map(roleDTO, roleToUpdate);
+                Role updateRole = _unitOfWork.Roles
+                    .Queryable()
+                    .Include(r => r.Department)
+                    .Include(r => r.PermissionsLink)
+                    .ThenInclude(pl => pl.Permission)
+                    .Single(r => r.Id == roleDTO.Id);
+
+
+                _mapper.Map(roleDTO, updateRole);
 
                 // Clear previously given permissions
-                roleToUpdate.Permissions.Clear();
+                updateRole.PermissionsLink.Clear();
 
                 foreach (int permissionId in roleDTO.PermissionIds)
                 {
                     Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                    roleToUpdate.Permissions.Add(permissionToAdd);
+                    updateRole.PermissionsLink.Add(new PermissionRoleLink
+                    {
+                        Role = updateRole,
+                        Permission = permissionToAdd
+                    });
                 }
-                _unitOfWork.Roles.Update(roleToUpdate);
+                _unitOfWork.Roles.Update(updateRole);
                 return await _unitOfWork.CompleteAsync() > 0 ? true : false;
             }
             catch (Exception ex)

@@ -1,8 +1,10 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace aspnetcore6.ntier.BLL.Utilities
@@ -11,11 +13,13 @@ namespace aspnetcore6.ntier.BLL.Utilities
     {
         private readonly ILogger<DataSeed> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ApiDbContext _context;
 
-        public DataSeed(ILogger<DataSeed> logger, IUnitOfWork unitOfWOrk)
+        public DataSeed(ILogger<DataSeed> logger, IUnitOfWork unitOfWOrk, ApiDbContext context)
         {
             _logger = logger;
             _unitOfWork = unitOfWOrk;
+            _context = context;
         }
 
         #region Environment seed methods (public)
@@ -23,6 +27,10 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             try
             {
+                #region Seed superuser
+                await SeedSuperuser();
+                #endregion
+
                 #region General entity
                 await SeedDepartments();
                 #endregion
@@ -75,7 +83,38 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 _logger.LogError(ex.Message);
             }
         }
+        #endregion
 
+        #region Seed superuser
+        private async Task SeedSuperuser()
+        {
+            IEnumerable<User> users = await _unitOfWork.Users.GetAll();
+
+            // Seed only if none exists
+            if (!users.Any())
+            { 
+                try
+                {
+                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted) 
+                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted)",
+                        new[]
+                        {
+                            new SqlParameter("@UserName", "SUPERUSER"),
+                            new SqlParameter("@FirstName", "SUPER"),
+                            new SqlParameter("@LastName", "USER"),
+                            new SqlParameter("@Email", "super.user@email.com"),
+                            new SqlParameter("@DateCreated", DateTime.UtcNow),
+                            new SqlParameter("@IsDeleted", false)
+                    });
+                    _logger.LogInformation("Super user account seeded successfully.");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred while seeding super user.");
+                }
+            }
+
+        }
         #endregion
 
         #region General entitiy seed methods (private)
@@ -165,67 +204,46 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 await _unitOfWork.CompleteAsync();
             }
         }
-
+        
         private async Task SeedRoles()
         {
             IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
-            IEnumerable<Permission> permissions = await _unitOfWork.Permissions.GetAll();
 
             // Seed only if none exists
             if (!roles.Any())
             {
-                List<Role> rolesToSeed = new List<Role>()
-                {
-                    new Role
-                    {
-                        Name = "Super Administrator",
-                        DepartmentId = 1,
-                    },
-                    new Role
-                    {
-                        Name = "Administrator",
-                        DepartmentId = 2,
-                    },
-                    new Role
-                    {
-                        Name = "User",
-                        DepartmentId = 2,
-                    },
-                    new Role
-                    {
-                        Name = "Guest",
-                        DepartmentId = 2,
-                    }
-                    ,
-                    new Role
-                    {
-                        Name = "Administrator",
-                        DepartmentId = 3,
-                    },
-                    new Role
-                    {
-                        Name = "User",
-                        DepartmentId = 3,
-                    },
-                    new Role
-                    {
-                        Name = "Guest",
-                        DepartmentId = 3,
-                    }
+                IEnumerable<Department> departments = await _unitOfWork.Departments.GetAll();
+                Random random = new Random();
+
+                string[] roleNames = {
+                    "Super Administrator",
+                    "Administrator",
+                    "User",
+                    "Guest",
+                    "Administrator",
+                    "User",
+                    "Guest",
                 };
 
-                Random random = new Random();
-                foreach (Role role in rolesToSeed)
+                foreach (string roleName in roleNames)
                 {
-                    // Get permissions from database with random id to mock data
-                    for (int i = 0; i < 3; i++)
+                    Role addRole = new Role()
                     {
-                        var randomId = random.Next(1, permissions.Count() + 1);
-                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(randomId);
-                        role.Permissions.Add(permissionToAdd);
+                        Name = roleName,
+                        DepartmentId = random.Next(1, departments.Count() + 1)
+                    };
+                
+                    for (int i = 1; i < 4; i++)
+                    {
+                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(i);
+                        addRole.PermissionsLink.Add(new PermissionRoleLink
+                        {
+                            Role = addRole,
+                            Permission = permissionToAdd
+                        });
                     }
 
-                    await _unitOfWork.Roles.Add(role);
+                    await _unitOfWork.Roles.Add(addRole);
                 }
                 await _unitOfWork.CompleteAsync();
             }
@@ -234,8 +252,8 @@ namespace aspnetcore6.ntier.BLL.Utilities
         private async Task SeedUsers()
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetAll();
-            // Seed only if none exists
-            if (!users.Any())
+            // Seed users only if there is just one user (Superuser)
+            if (users.Any() && !(users.Count() == 1))
             {
                 List<User> usersToSeed = new List<User>()
                 {
