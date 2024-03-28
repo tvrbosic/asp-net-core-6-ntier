@@ -4,6 +4,7 @@ using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text.Json;
 
 public class ApiDbContext : DbContext
 {
@@ -12,6 +13,7 @@ public class ApiDbContext : DbContext
     }
     #region General entity registration
     public DbSet<Department> Departments { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
     #endregion
 
     #region Access control entity registration
@@ -111,23 +113,22 @@ public class ApiDbContext : DbContext
     public override int SaveChanges()
     {
         ProcessChangetrackerEntries();
-        //HandleAudit();
-
+        ProcessAuditLog();
         return base.SaveChanges();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         ProcessChangetrackerEntries();
-        //HandleAudit();
-
+        ProcessAuditLog(); 
         return await base.SaveChangesAsync(cancellationToken);
     }
 
     private void ProcessChangetrackerEntries()
     {
         // Get entities from database context which are extended from BaseEntitiy class prior to executing database query
-        var modifiedEntries = this.ChangeTracker.Entries().Where(e => e.Entity is BaseEntity);
+        var modifiedEntries = this.ChangeTracker.Entries()
+            .Where(e => (e.Entity is BaseEntity) || (e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted));
 
         // Update BaseEntity properties according to entity state 
         foreach (var entry in modifiedEntries)
@@ -135,7 +136,7 @@ public class ApiDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Property("CreatedById").CurrentValue = 1; // TODO: Application user ID is null currently to be able to do initial fill. Replace with user ID from HTTP request.
+                    entry.Property("CreatedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
                     entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
                     break;
                 case EntityState.Modified:
@@ -148,13 +149,13 @@ public class ApiDbContext : DbContext
                     entry.Property("IsDeleted").CurrentValue = true;
                     entry.State = EntityState.Modified;
                     // Cascade soft delete navigation properties
-                    HandleCascadeSoftDelete(entry);
+                    ProcessCascadeSoftDelete(entry);
                     break;
             }
         }
     }
 
-    private void HandleCascadeSoftDelete(EntityEntry entry)
+    private void ProcessCascadeSoftDelete(EntityEntry entry)
     {
         foreach (var navigationEntry in entry.Navigations)
         {
@@ -184,9 +185,30 @@ public class ApiDbContext : DbContext
         }
     }
 
-    private void HandleAudit()
+    private void ProcessAuditLog()
     {
-        // TODO
+        var auditLogEntries = ChangeTracker.Entries()
+            .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted))
+            .Select(e =>
+            {
+                var entryData = JsonSerializer.Serialize(e.Properties.ToDictionary(p => p.Metadata.Name, p => p.CurrentValue));
+                var newAuditLog = new AuditLog
+                {
+                    AuditKey = (Guid) e.Properties.Where(p => p.Metadata.Name.ToUpper() == "AUDITKEY").Select(p => p.CurrentValue).FirstOrDefault(),
+                    UserId = 1, // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    UserName = "SUPERUSER", // TODO: Mock set of application user name. Replace with user name from HTTP request.
+                    Operation = (Boolean) e.Properties
+                        .Where(p => p.Metadata.Name.ToUpper() == "ISDELETED")
+                        .Select(p => p.CurrentValue)
+                        .FirstOrDefault() == true ? EntityState.Deleted.ToString() : e.State.ToString(),
+                    Timestamp = DateTime.UtcNow,
+                    EntityName = e.Entity.GetType().Name,
+                    EntityData = entryData,
+                };
+                return newAuditLog;
+            }).ToList();
+
+        AuditLogs.AddRange(auditLogEntries);
     }
     #endregion
 }
