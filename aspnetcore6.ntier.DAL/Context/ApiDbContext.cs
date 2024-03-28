@@ -22,7 +22,6 @@ public class ApiDbContext : DbContext
     public DbSet<RoleUserLink> RoleUserLinks { get; set; }
     #endregion
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -59,8 +58,7 @@ public class ApiDbContext : DbContext
             entity
                 .HasOne(u => u.Department)
                 .WithMany(d => d.Users)
-                .HasForeignKey(u => u.DepartmentId)
-                .IsRequired();
+                .HasForeignKey(u => u.DepartmentId);
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -135,7 +133,7 @@ public class ApiDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Property("CreatedById").CurrentValue = null; // TODO: Application user ID is null currently to be able to do initial fill. Replace with user ID from HTTP request.
+                    entry.Property("CreatedById").CurrentValue = 1; // TODO: Application user ID is null currently to be able to do initial fill. Replace with user ID from HTTP request.
                     entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
                     break;
                 case EntityState.Modified:
@@ -189,7 +187,6 @@ public class ApiDbContext : DbContext
         // TODO
     }
     #endregion
-
 }
 
 

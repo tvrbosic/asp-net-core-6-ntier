@@ -240,7 +240,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -461,9 +461,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.General.Department", "Department")
                         .WithMany("Users")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentId");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
                         .WithMany()
