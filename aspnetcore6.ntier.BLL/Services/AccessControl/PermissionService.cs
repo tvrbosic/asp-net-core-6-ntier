@@ -41,7 +41,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         public async Task<bool> UpdatePermission(UpdatePermissionDTO permissionDTO)
         {
             Permission permission = _mapper.Map<Permission>(permissionDTO);
-            _unitOfWork.Permissions.Update(permission);
+            await _unitOfWork.Permissions.Update(permission);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 

@@ -20,35 +20,40 @@ namespace aspnetcore6.ntier.API.Controllers.General
         public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
         {
             IEnumerable<DepartmentDTO> departments = await _departmentService.GetDepartments();
-            return Ok(departments);
+            var response = new ApiDataResponse<IEnumerable<DepartmentDTO>>(departments, "Departments retrieved succcessfully.");
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDTO>> GetDepartment(int id)
         {
             DepartmentDTO department = await _departmentService.GetDepartment(id);
-            return Ok(department);
+            var response = new ApiDataResponse<DepartmentDTO>(department, "Department retrieved succcessfully.");
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> PostDepartment(AddDepartmentDTO departmentDTO)
         {
             await _departmentService.AddDepartment(departmentDTO);
-            return Ok();
+            var response = new ApiBaseResponse("Department creaeted succcessfully.");
+            return Ok(response);
         }
 
         [HttpPut]
         public async Task<IActionResult> PutDepartment(UpdateDepartmentDTO departmentDTO)
         {
             await _departmentService.UpdateDepartment(departmentDTO);
-            return Ok();
+            var response = new ApiBaseResponse("Department updated succcessfully.");
+            return Ok(response);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             await _departmentService.DeleteDepartment(id);
-            return Ok(); ;
+            var response = new ApiBaseResponse("Department deleted succcessfully.");
+            return Ok(response);
         }
     }
 }

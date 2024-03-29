@@ -83,7 +83,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                     Permission = permissionToAdd
                 });
             }
-            _unitOfWork.Roles.Update(updateRole);
+            await _unitOfWork.Roles.Update(updateRole);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 

@@ -1,4 +1,5 @@
 ﻿using aspnetcore6.ntier.API.Responses;
+using aspnetcore6.ntier.DAL.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Security;
@@ -37,15 +38,13 @@ namespace aspnetcore6.ntier.API.Middleware
             // Response
             HttpStatusCode statusCode;
             string returnErrorMessage = "";
-            ExceptionResponse response;
+            ApiErrorResponse response;
 
 
             // Determine response and log message based on exception type
             switch (exception)
             {
                 // Bad request (400)
-                case HttpListenerException:
-
                 case ArgumentNullException:
                     logLevel = LogLevel.Warning;
                     logErrorMessage = exception.Message;
@@ -70,12 +69,18 @@ namespace aspnetcore6.ntier.API.Middleware
                     statusCode = HttpStatusCode.BadRequest;
                     returnErrorMessage = "The request data is not in the expected format.";
                     break;
+                case EntityNotFoundException:
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.BadRequest;
+                    returnErrorMessage = "The requested operation failed because the targeted entity does not exist.";
+                    break;
                 // Unauthorized (401)
                 case UnauthorizedAccessException:
                     logLevel = LogLevel.Warning;
                     logErrorMessage = exception.Message;
                     statusCode = HttpStatusCode.Unauthorized;
-                    response = new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized access. Please authenticate.");
+                    returnErrorMessage = "Unauthorized access. Please authenticate.";
                     break;
                 // Forbidden (403)
                 case SecurityException:
@@ -106,7 +111,7 @@ namespace aspnetcore6.ntier.API.Middleware
 
 
             // Construct response
-            response = new ExceptionResponse(statusCode, returnErrorMessage);
+            response = new ApiErrorResponse(statusCode, returnErrorMessage);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)response.StatusCode;

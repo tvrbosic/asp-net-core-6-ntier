@@ -1,7 +1,9 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿using aspnetcore6.ntier.DAL.Exceptions;
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace aspnetcore6.ntier.DAL.Repositories
 {
@@ -78,11 +80,18 @@ namespace aspnetcore6.ntier.DAL.Repositories
             await _dbSet.AddRangeAsync(entities);
         }
 
-        public virtual Task Update(TEntity entity)
+        public virtual async Task Update(TEntity entity)
         {
-            _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-            return Task.CompletedTask;
+            var existingEntity = await GetById(entity.Id);
+            if (existingEntity != null)
+            {
+                _dbSet.Attach(entity);
+                _context.Entry(entity).State = EntityState.Modified;
+            }
+            else
+            {
+                throw new EntityNotFoundException("$Update operation failed for entitiy {entity.GetType()} with id: {id}");
+            }
         }
 
         public virtual async Task Delete(int id)
@@ -91,6 +100,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
             if (entity != null)
             {
                 _context.Remove(entity);
+            }
+            else
+            {
+                throw new EntityNotFoundException("$Delete operation failed for entitiy {entity.GetType()} with id: {id}");
             }
         }
     }
