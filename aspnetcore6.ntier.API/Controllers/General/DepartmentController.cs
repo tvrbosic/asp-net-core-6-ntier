@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.BLL.Services.General.DTOs;
+﻿using aspnetcore6.ntier.API.Responses;
+using aspnetcore6.ntier.BLL.Services.General.DTOs;
 using aspnetcore6.ntier.BLL.Services.General.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,32 +20,35 @@ namespace aspnetcore6.ntier.API.Controllers.General
         public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
         {
             IEnumerable<DepartmentDTO> departments = await _departmentService.GetDepartments();
-            return departments == null ? NotFound() : Ok(departments);
+            return Ok(departments);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDTO>> GetDepartment(int id)
         {
             DepartmentDTO department = await _departmentService.GetDepartment(id);
-            return department == null ? NotFound() : Ok(department);
+            return Ok(department);
         }
 
         [HttpPost]
         public async Task<IActionResult> PostDepartment(AddDepartmentDTO departmentDTO)
         {
-            return await _departmentService.AddDepartment(departmentDTO) ? Ok() : BadRequest();
+            await _departmentService.AddDepartment(departmentDTO);
+            return Ok();
         }
 
         [HttpPut]
         public async Task<IActionResult> PutDepartment(UpdateDepartmentDTO departmentDTO)
         {
-            return await _departmentService.UpdateDepartment(departmentDTO) ? Ok() : BadRequest();
+            await _departmentService.UpdateDepartment(departmentDTO);
+            return Ok();
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            return await _departmentService.DeleteDepartment(id) ? Ok() : BadRequest();
+            await _departmentService.DeleteDepartment(id);
+            return Ok(); ;
         }
     }
 }

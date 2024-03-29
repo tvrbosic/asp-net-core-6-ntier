@@ -44,6 +44,8 @@ namespace aspnetcore6.ntier.API.Middleware
             switch (exception)
             {
                 // Bad request (400)
+                case HttpListenerException:
+
                 case ArgumentNullException:
                     logLevel = LogLevel.Warning;
                     logErrorMessage = exception.Message;

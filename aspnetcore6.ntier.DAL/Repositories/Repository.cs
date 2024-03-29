@@ -78,10 +78,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
             await _dbSet.AddRangeAsync(entities);
         }
 
-        public virtual void Update(TEntity entity)
+        public virtual Task Update(TEntity entity)
         {
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
+            return Task.CompletedTask;
         }
 
         public virtual async Task Delete(int id)

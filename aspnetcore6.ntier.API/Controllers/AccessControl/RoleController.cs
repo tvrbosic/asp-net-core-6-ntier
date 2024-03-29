@@ -19,32 +19,35 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRoles()
         {
             IEnumerable<RoleDTO> roles = await _roleService.GetRoles();
-            return roles == null ? NotFound() : Ok(roles);
+            return Ok(roles);
         }
 
         [HttpGet("{id}")]
         public ActionResult<RoleDTO> GetRole(int id)
         {
             RoleDTO role = _roleService.GetRole(id);
-            return role == null ? NotFound() : Ok(role);
+            return Ok(role);
         }
 
         [HttpPost]
         public async Task<IActionResult> PostRole(AddRoleDTO roleDTO)
         {
-            return await _roleService.AddRole(roleDTO) ? Ok() : BadRequest();
+            await _roleService.AddRole(roleDTO);
+            return  Ok();
         }
 
         [HttpPut]
         public async Task<IActionResult> PutRole(UpdateRoleDTO roleDTO)
         {
-            return await _roleService.UpdateRole(roleDTO) ? Ok() : BadRequest();
+            await _roleService.UpdateRole(roleDTO);
+            return  Ok();
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteRole(int id)
         {
-            return await _roleService.DeleteRole(id) ? Ok() : BadRequest();
+            await _roleService.DeleteRole(id);
+            return  Ok();
         }
     }
 }

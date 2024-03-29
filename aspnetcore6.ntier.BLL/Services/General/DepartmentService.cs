@@ -31,48 +31,24 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTO;
         }
 
-        public async Task<bool> AddDepartment(AddDepartmentDTO departmentDTO)
+        public async Task AddDepartment(AddDepartmentDTO departmentDTO)
         {
-            try
-            {
-                Department department = _mapper.Map<Department>(departmentDTO);
-                await _unitOfWork.Departments.Add(department);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Department department = _mapper.Map<Department>(departmentDTO);
+             await _unitOfWork.Departments.Add(department);
+             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<bool> UpdateDepartment(UpdateDepartmentDTO departmentDTO)
+        public async Task UpdateDepartment(UpdateDepartmentDTO departmentDTO)
         {
-            try
-            {
-                Department department = _mapper.Map<Department>(departmentDTO);
-                _unitOfWork.Departments.Update(department);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Department department = _mapper.Map<Department>(departmentDTO);
+            await _unitOfWork.Departments.Update(department);
+            await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<bool> DeleteDepartment(int id)
+        public async Task DeleteDepartment(int id)
         {
-            try
-            {
-                await _unitOfWork.Departments.Delete(id);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            await _unitOfWork.Departments.Delete(id);
+            await _unitOfWork.CompleteAsync();
         }
     }
 }
