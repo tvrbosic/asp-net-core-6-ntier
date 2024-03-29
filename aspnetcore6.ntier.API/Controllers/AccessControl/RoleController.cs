@@ -1,9 +1,6 @@
 ﻿using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
-using aspnetcore6.ntier.BLL.Services.General.DTOs;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.General;
+using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.AccessControl

@@ -1,13 +1,14 @@
 ﻿using aspnetcore6.ntier.DAL.Exceptions;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.Abstract;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Net;
 
 namespace aspnetcore6.ntier.DAL.Repositories
 {
-   public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         private readonly ApiDbContext _context;
         private readonly DbSet<TEntity> _dbSet;
@@ -28,9 +29,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllPaginated(int PageNumber, int PageSize)
+        public async Task<PaginatedData<TEntity>> GetAllPaginated(int PageNumber, int PageSize)
         {
-            return await _dbSet.AsNoTracking().Skip((PageNumber - 1) * PageSize).Take(PageSize).ToListAsync();
+            var entries = _dbSet.AsNoTracking();
+            return await PaginatedData<TEntity>.ToPaginatedData(entries, PageNumber, PageSize);
         }
 
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)

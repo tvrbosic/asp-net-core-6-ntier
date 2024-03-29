@@ -1,4 +1,4 @@
-﻿namespace aspnetcore6.ntier.BLL.Services.General.DTOs
+﻿namespace aspnetcore6.ntier.BLL.DTOs.General
 {
     public class AddDepartmentDTO
     {

@@ -1,6 +1,6 @@
-﻿using aspnetcore6.ntier.BLL.Services.General.DTOs;
+﻿using aspnetcore6.ntier.BLL.DTOs.General;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl.DTOs
+namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
 {
     public class RoleDTO
     {

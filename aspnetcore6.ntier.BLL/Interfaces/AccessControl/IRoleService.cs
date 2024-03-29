@@ -1,6 +1,6 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces
+namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
 {
     public interface IRoleService
     {

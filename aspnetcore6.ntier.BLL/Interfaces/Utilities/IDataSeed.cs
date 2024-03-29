@@ -1,4 +1,4 @@
-﻿namespace aspnetcore6.ntier.BLL.Utilities.Interfaces
+﻿namespace aspnetcore6.ntier.BLL.Interfaces.Utilities
 {
     public interface IDataSeed
     {

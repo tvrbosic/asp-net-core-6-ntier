@@ -1,7 +1,9 @@
-﻿using aspnetcore6.ntier.BLL.Services.General.DTOs;
-using aspnetcore6.ntier.BLL.Services.General.Interfaces;
+﻿using aspnetcore6.ntier.BLL.DTOs.General;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.BLL.Interfaces.General;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 
 namespace aspnetcore6.ntier.BLL.Services.General
@@ -24,12 +26,11 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
-        public async Task<IEnumerable<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
+        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
         {
-            IEnumerable<Department> departments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
-            IEnumerable<DepartmentDTO> departmentDTOs = _mapper.Map<IEnumerable<DepartmentDTO>>(departments);
-
-            return departmentDTOs;
+            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
+            PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);
+            return paginatedDepartmentDTOs;
         }
 
         public async Task<DepartmentDTO> GetDepartment(int id)
