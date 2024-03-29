@@ -24,6 +24,14 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
+        public async Task<IEnumerable<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
+        {
+            IEnumerable<Department> departments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
+            IEnumerable<DepartmentDTO> departmentDTOs = _mapper.Map<IEnumerable<DepartmentDTO>>(departments);
+
+            return departmentDTOs;
+        }
+
         public async Task<DepartmentDTO> GetDepartment(int id)
         {
             Department department = await _unitOfWork.Departments.GetById(id);

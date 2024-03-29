@@ -6,6 +6,8 @@ namespace aspnetcore6.ntier.BLL.Services.General.Interfaces
     {
         Task<IEnumerable<DepartmentDTO>> GetDepartments();
 
+        Task<IEnumerable<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize);
+
         Task<DepartmentDTO> GetDepartment(int id);
 
         Task AddDepartment(AddDepartmentDTO department);

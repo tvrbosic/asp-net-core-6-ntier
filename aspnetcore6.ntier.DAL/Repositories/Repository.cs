@@ -28,6 +28,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllPaginated(int PageNumber, int PageSize)
+        {
+            return await _dbSet.AsNoTracking().Skip((PageNumber - 1) * PageSize).Take(PageSize).ToListAsync();
+        }
+
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var query = _dbSet.AsNoTracking().AsQueryable();
@@ -37,21 +42,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
             }
             return await query.AsNoTracking().ToListAsync();
 
-        }
-
-        public async Task<TEntity> GetById(int id)
-        {
-            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
-        }
-
-        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
-        {
-            var query = _dbSet.AsQueryable();
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-            return await query.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
@@ -69,6 +59,20 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await query.Where(predicate).ToListAsync();
         }
 
+        public async Task<TEntity> GetById(int id)
+        {
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(e => e.Id == id);
+        }
 
         public async Task Add(TEntity entity)
         {

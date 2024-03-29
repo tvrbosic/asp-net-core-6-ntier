@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
-    <Folder Include="Policies\" />
+	<Folder Include="Policies\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.API.Responses;
+﻿using aspnetcore6.ntier.API.Requests;
+using aspnetcore6.ntier.API.Responses;
 using aspnetcore6.ntier.BLL.Services.General.DTOs;
 using aspnetcore6.ntier.BLL.Services.General.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,14 @@ namespace aspnetcore6.ntier.API.Controllers.General
         public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
         {
             IEnumerable<DepartmentDTO> departments = await _departmentService.GetDepartments();
+            var response = new ApiDataResponse<IEnumerable<DepartmentDTO>>(departments, "Departments retrieved succcessfully.");
+            return Ok(response);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters queryParameters)
+        {
+            IEnumerable<DepartmentDTO> departments = await _departmentService.GetPaginatedDepartments(queryParameters.PageNumber, queryParameters.PageSize);
             var response = new ApiDataResponse<IEnumerable<DepartmentDTO>>(departments, "Departments retrieved succcessfully.");
             return Ok(response);
         }
