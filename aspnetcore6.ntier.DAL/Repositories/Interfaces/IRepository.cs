@@ -14,7 +14,7 @@ namespace aspnetcore6.ntier.DAL.Repositories.Interfaces
         Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
         Task Add(TEntity entity);
         Task AddRange(IEnumerable<TEntity> entities);
-        void Update(TEntity entity);
+        Task Update(TEntity entity);
         Task Delete(int id);
     }
 }

@@ -33,46 +33,22 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> AddPermission(AddPermissionDTO permissionDTO)
         {
-            try
-            {
-                Permission permission = _mapper.Map<Permission>(permissionDTO);
-                await _unitOfWork.Permissions.Add(permission);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Permission permission = _mapper.Map<Permission>(permissionDTO);
+            await _unitOfWork.Permissions.Add(permission);
+            return await _unitOfWork.CompleteAsync() > 0;
         }
 
         public async Task<bool> UpdatePermission(UpdatePermissionDTO permissionDTO)
         {
-            try
-            {
-                Permission permission = _mapper.Map<Permission>(permissionDTO);
-                _unitOfWork.Permissions.Update(permission);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Permission permission = _mapper.Map<Permission>(permissionDTO);
+            _unitOfWork.Permissions.Update(permission);
+            return await _unitOfWork.CompleteAsync() > 0;
         }
 
         public async Task<bool> DeletePermission(int id)
         {
-            try
-            {
-                await _unitOfWork.Permissions.Delete(id);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            await _unitOfWork.Permissions.Delete(id);
+            return await _unitOfWork.CompleteAsync() > 0;
         }
     }
 }

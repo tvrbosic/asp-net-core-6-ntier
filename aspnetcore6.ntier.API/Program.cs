@@ -1,3 +1,4 @@
+using aspnetcore6.ntier.API.Middleware;
 using aspnetcore6.ntier.BLL.Services.AccessControl;
 using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
 using aspnetcore6.ntier.BLL.Services.General;
@@ -84,7 +85,11 @@ using (var scope = app.Services.CreateScope())
 }
 #endregion
 
-#region Configure the HTTP request pipeline.
+#region Configure the HTTP request pipeline
+// REMINDER: Keep in mind that middleware invoking order is important!
+// Global exception handler
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

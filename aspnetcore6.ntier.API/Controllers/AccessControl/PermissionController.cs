@@ -19,32 +19,35 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPermissions()
         {
             IEnumerable<PermissionDTO> permissions = await _permissionService.GetPermissions();
-            return permissions == null ? NotFound() : Ok(permissions);
+            return Ok(permissions);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PermissionDTO>> GetPermission(int id)
         {
             PermissionDTO permission = await _permissionService.GetPermission(id);
-            return permission == null ? NotFound() : Ok(permission);
+            return Ok(permission);
         }
 
         [HttpPost]
         public async Task<IActionResult> PostPermission(AddPermissionDTO permissionDTO)
         {
-            return await _permissionService.AddPermission(permissionDTO) ? Ok() : BadRequest();
+            await _permissionService.AddPermission(permissionDTO);
+            return Ok();
         }
 
         [HttpPut]
         public async Task<IActionResult> PutPermission(UpdatePermissionDTO permissionDTO)
         {
-            return await _permissionService.UpdatePermission(permissionDTO) ? Ok() : BadRequest();
+            await _permissionService.UpdatePermission(permissionDTO);
+            return Ok();
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeletePermission(int id)
         {
-            return await _permissionService.DeletePermission(id) ? Ok() : BadRequest();
+            await _permissionService.DeletePermission(id);
+            return Ok();
         }
     }
 }
