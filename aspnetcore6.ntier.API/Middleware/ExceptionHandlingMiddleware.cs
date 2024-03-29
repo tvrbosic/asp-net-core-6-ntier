@@ -30,39 +30,81 @@ namespace aspnetcore6.ntier.API.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            // Logger
+            LogLevel logLevel;
+            string logErrorMessage;
+
+            // Response
+            HttpStatusCode statusCode;
+            string returnErrorMessage = "";
             ExceptionResponse response;
-            _logger.LogError(exception, "An unexpected error occurred.");
 
 
+            // Determine response and log message based on exception type
             switch (exception)
             {
                 // Bad request (400)
                 case ArgumentNullException:
-                    response = new ExceptionResponse(HttpStatusCode.BadRequest, "The request is missing required parameters.");
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.BadRequest;
+                    returnErrorMessage = "The request is missing required parameters.";
                     break;
                 case ArgumentException:
-                    response = new ExceptionResponse(HttpStatusCode.BadRequest, "The request contains invalid arguments.");
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.BadRequest;
+                    returnErrorMessage = "The request contains invalid arguments.";
                     break;
                 case ValidationException:
-                    response = new ExceptionResponse(HttpStatusCode.BadRequest, "Validation failed for the request data.");
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.BadRequest;
+                    returnErrorMessage = "Validation failed for the request data.";
                     break;
                 case FormatException:
-                    response = new ExceptionResponse(HttpStatusCode.BadRequest, "The request data is not in the expected format.");
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.BadRequest;
+                    returnErrorMessage = "The request data is not in the expected format.";
                     break;
                 // Unauthorized (401)
                 case UnauthorizedAccessException:
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.Unauthorized;
                     response = new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized access. Please authenticate.");
                     break;
                 // Forbidden (403)
                 case SecurityException:
-                    response = new ExceptionResponse(HttpStatusCode.Forbidden, "Access denied. You don't have permission to access this resource.");
+                    logLevel = LogLevel.Warning;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.Forbidden;
+                    returnErrorMessage = "Access denied. You don't have permission to access this resource.";
                     break;
                 // Internal server error (500)
                 default:
-                    response = new ExceptionResponse(HttpStatusCode.InternalServerError, "Internal server error. Please try again later or contact the administrator for support.");
+                    logLevel = LogLevel.Error;
+                    logErrorMessage = exception.Message;
+                    statusCode = HttpStatusCode.InternalServerError;
+                    returnErrorMessage = "Internal server error. Please try again later or contact the administrator for support.";
                     break;
 
             }
+
+            // Log error message based on log level
+            if (logLevel == LogLevel.Warning)
+            {
+                _logger.LogWarning(exception, logErrorMessage);
+            }
+            else
+            {
+                _logger.LogError(exception, logErrorMessage);
+            }
+
+
+            // Construct response
+            response = new ExceptionResponse(statusCode, returnErrorMessage);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)response.StatusCode;
