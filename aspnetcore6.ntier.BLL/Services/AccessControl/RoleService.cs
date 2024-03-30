@@ -1,7 +1,9 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +29,13 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                 .ThenInclude(pl => pl.Permission).ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
+        }
+
+        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(int PageNumber, int PageSize)
+        {
+            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(PageNumber, PageSize);
+            PaginatedDataDTO<RoleDTO> paginatedRoleDTOs = _mapper.Map<PaginatedDataDTO<RoleDTO>>(paginatedRoles);
+            return paginatedRoleDTOs;
         }
 
         public RoleDTO GetRole(int id)
@@ -83,7 +92,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                     Permission = permissionToAdd
                 });
             }
-            _unitOfWork.Roles.Update(updateRole);
+            await _unitOfWork.Roles.Update(updateRole);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 

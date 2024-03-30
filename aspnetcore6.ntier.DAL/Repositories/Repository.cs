@@ -1,11 +1,14 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+﻿using aspnetcore6.ntier.DAL.Exceptions;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
+using aspnetcore6.ntier.DAL.Models.Abstract;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace aspnetcore6.ntier.DAL.Repositories
 {
-   public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         private readonly ApiDbContext _context;
         private readonly DbSet<TEntity> _dbSet;
@@ -26,6 +29,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
+        public async Task<PaginatedData<TEntity>> GetAllPaginated(int PageNumber, int PageSize)
+        {
+            var entries = _dbSet.AsNoTracking();
+            return await PaginatedData<TEntity>.ToPaginatedData(entries, PageNumber, PageSize);
+        }
+
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var query = _dbSet.AsNoTracking().AsQueryable();
@@ -35,21 +44,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
             }
             return await query.AsNoTracking().ToListAsync();
 
-        }
-
-        public async Task<TEntity> GetById(int id)
-        {
-            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
-        }
-
-        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
-        {
-            var query = _dbSet.AsQueryable();
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-            return await query.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
@@ -67,6 +61,20 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await query.Where(predicate).ToListAsync();
         }
 
+        public async Task<TEntity> GetById(int id)
+        {
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(e => e.Id == id);
+        }
 
         public async Task Add(TEntity entity)
         {
@@ -78,11 +86,18 @@ namespace aspnetcore6.ntier.DAL.Repositories
             await _dbSet.AddRangeAsync(entities);
         }
 
-        public virtual Task Update(TEntity entity)
+        public virtual async Task Update(TEntity entity)
         {
-            _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-            return Task.CompletedTask;
+            var existingEntity = await GetById(entity.Id);
+            if (existingEntity != null)
+            {
+                _dbSet.Attach(entity);
+                _context.Entry(entity).State = EntityState.Modified;
+            }
+            else
+            {
+                throw new EntityNotFoundException("$Update operation failed for entitiy {entity.GetType()} with id: {id}");
+            }
         }
 
         public virtual async Task Delete(int id)
@@ -91,6 +106,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
             if (entity != null)
             {
                 _context.Remove(entity);
+            }
+            else
+            {
+                throw new EntityNotFoundException("$Delete operation failed for entitiy {entity.GetType()} with id: {id}");
             }
         }
     }

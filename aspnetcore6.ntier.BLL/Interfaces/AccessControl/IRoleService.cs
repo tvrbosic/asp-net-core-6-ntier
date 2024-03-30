@@ -1,10 +1,13 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces
+namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
 {
     public interface IRoleService
     {
         Task<IEnumerable<RoleDTO>> GetRoles();
+
+        Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(int CurrentPage, int PageSize);
 
         RoleDTO GetRole(int id);
 

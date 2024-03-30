@@ -1,7 +1,8 @@
-﻿namespace aspnetcore6.ntier.BLL.Services.AccessControl.DTOs
+﻿namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
 {
-    public class AddRoleDTO
+    public class UpdateRoleDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public int DepartmentId { get; set; }
 

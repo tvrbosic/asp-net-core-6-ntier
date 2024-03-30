@@ -1,7 +1,9 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 
 namespace aspnetcore6.ntier.BLL.Services.AccessControl
@@ -24,6 +26,14 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return permissionDTOs;
         }
 
+
+        public async Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(int PageNumber, int PageSize)
+        {
+            PaginatedData<Permission> paginatedPermissions = await _unitOfWork.Permissions.GetAllPaginated(PageNumber, PageSize);
+            PaginatedDataDTO<PermissionDTO> paginatedPermissionDTOs = _mapper.Map<PaginatedDataDTO<PermissionDTO>>(paginatedPermissions);
+            return paginatedPermissionDTOs;
+        }
+
         public async Task<PermissionDTO> GetPermission(int id)
         {
             Permission permission = await _unitOfWork.Permissions.GetByIdIncluding(id, p => p.Department);
@@ -41,7 +51,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         public async Task<bool> UpdatePermission(UpdatePermissionDTO permissionDTO)
         {
             Permission permission = _mapper.Map<Permission>(permissionDTO);
-            _unitOfWork.Permissions.Update(permission);
+            await _unitOfWork.Permissions.Update(permission);
             return await _unitOfWork.CompleteAsync() > 0;
         }
 

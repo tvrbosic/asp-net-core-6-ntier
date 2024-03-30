@@ -1,12 +1,12 @@
 using aspnetcore6.ntier.API.Middleware;
+using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.BLL.Interfaces.General;
+using aspnetcore6.ntier.BLL.Interfaces.Utilities;
 using aspnetcore6.ntier.BLL.Services.AccessControl;
-using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
 using aspnetcore6.ntier.BLL.Services.General;
-using aspnetcore6.ntier.BLL.Services.General.Interfaces;
 using aspnetcore6.ntier.BLL.Utilities;
-using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Repositories;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 

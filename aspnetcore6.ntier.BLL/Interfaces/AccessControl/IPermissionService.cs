@@ -1,10 +1,13 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces
+namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
 {
     public interface IPermissionService
     {
         Task<IEnumerable<PermissionDTO>> GetPermissions();
+
+        Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(int CurrentPage, int PageSize);
 
         Task<PermissionDTO> GetPermission(int id);
 
