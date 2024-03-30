@@ -1,7 +1,6 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
 using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.General;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;

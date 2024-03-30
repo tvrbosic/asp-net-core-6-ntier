@@ -53,7 +53,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDTO>> GetDepartment(int id)
         {
-            DepartmentDTO department = await _departmentService.GetDepartment(id);
+            DepartmentDTO? department = await _departmentService.GetDepartment(id);
             var response = new ApiDataResponse<DepartmentDTO>(department, "Department retrieved succcessfully.");
             return Ok(response);
         }

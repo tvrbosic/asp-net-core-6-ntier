@@ -36,12 +36,11 @@ namespace aspnetcore6.ntier.DAL.Repositories
         }
 
         public async Task<PaginatedData<TEntity>> GetAllPaginated(
-            int PageNumber, 
-            int PageSize, 
-            string? searchInput, 
-            string[]? 
-            searchProperties, 
-            string orderByProperty  = "Id", 
+            int PageNumber,
+            int PageSize,
+            string? searchInput,
+            string[]? searchProperties,
+            string orderByProperty = "Id",
             bool ascending = true)
         {
             var filteredEntities = SearchFilter(_dbSet.AsNoTracking(), searchInput, searchProperties);
@@ -53,7 +52,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsNoTracking().AsQueryable();
-            
+
             foreach (var includeProperty in includes)
             {
                 entities = entities.Include(includeProperty);
@@ -173,13 +172,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
             // Parameter expression for the input parameter to the lambda expression
             var lambdaParameter = Expression.Parameter(typeof(TEntity), "e");
             // Member access expression for accessing the property to be sorted
-            var labmdaProperty = Expression.Property(lambdaParameter, orderByProperty);
-            // Lambda expression for the sorting condition (x => x.orderByProperty)
-            var lambda = Expression.Lambda<Func<TEntity, int>>(labmdaProperty, lambdaParameter);
+            var lambdaProperty = Expression.Property(lambdaParameter, orderByProperty);
+
+            // Lambda expression for the sorting condition (x => x.orderByProperty). Convert is necessary because orderByProperty can be of different types.
+            var lambda = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(lambdaProperty, typeof(object)), lambdaParameter);
 
             // Return ordered 
             return ascending ? entities.OrderBy(lambda) : entities.OrderByDescending(lambda);
-            #endregion
         }
+        #endregion
     }
 }
