@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+using Microsoft.EntityFrameworkCore;
 
 namespace aspnetcore6.ntier.DAL.Models.Shared
 {
-    public class PaginatedData<TEntity>
+    public class PaginatedData<TEntity> where TEntity : BaseEntity
     {
         public PaginatedData(IEnumerable<TEntity> entities, int count, int pageNumber, int pageSize)
         {
@@ -25,7 +26,7 @@ namespace aspnetcore6.ntier.DAL.Models.Shared
         public static async Task<PaginatedData<TEntity>> ToPaginatedData(IQueryable<TEntity> source, int pageNumber, int pageSize)
         {
             var count = source.Count();
-            var entities = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var entities = await source.OrderBy(e => e.Id).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return new PaginatedData<TEntity>(entities, count, pageNumber, pageSize);
         }

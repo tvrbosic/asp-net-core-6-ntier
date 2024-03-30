@@ -1,5 +1,8 @@
-﻿using aspnetcore6.ntier.API.Responses;
+﻿using aspnetcore6.ntier.API.Requests;
+using aspnetcore6.ntier.API.Responses;
 using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.General;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +24,23 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         {
             IEnumerable<RoleDTO> roles = await _roleService.GetRoles();
             var response = new ApiDataResponse<IEnumerable<RoleDTO>>(roles, "Roles retrieved succcessfully.");
+            return Ok(response);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters queryParameters)
+        {
+            PaginatedDataDTO<RoleDTO> paginatedRoles = await _roleService.GetPaginatedRoles(queryParameters.CurrentPage, queryParameters.PageSize);
+            var response = new ApiPagnatedResponse<RoleDTO>(
+                paginatedRoles.Data,
+                paginatedRoles.CurrentPage,
+                paginatedRoles.TotalPages,
+                paginatedRoles.PageSize,
+                paginatedRoles.TotalCount,
+                paginatedRoles.HasPrevious,
+                paginatedRoles.HasNext,
+                "Roles retrieved succcessfully.");
+
             return Ok(response);
         }
 
