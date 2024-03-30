@@ -1,5 +1,7 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
+﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 
 namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
@@ -10,6 +12,7 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
         {
             // Permission
             CreateMap<Permission, PermissionDTO>();
+            CreateMap<PaginatedData<Permission>, PaginatedDataDTO<PermissionDTO>>();
             CreateMap<AddPermissionDTO, Permission>();
             CreateMap<UpdatePermissionDTO, Permission>();
 
@@ -17,6 +20,7 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
             CreateMap<Role, Role>();
             CreateMap<Role, RoleDTO>()
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionsLink.Select(pl => pl.Permission)));
+            CreateMap<PaginatedData<Role>, PaginatedDataDTO<RoleDTO>>();
             CreateMap<AddRoleDTO, Role>();
             CreateMap<UpdateRoleDTO, Role>();
 

@@ -1,5 +1,9 @@
-﻿using aspnetcore6.ntier.BLL.Services.AccessControl.DTOs;
-using aspnetcore6.ntier.BLL.Services.AccessControl.Interfaces;
+﻿using aspnetcore6.ntier.API.Requests;
+using aspnetcore6.ntier.API.Responses;
+using aspnetcore6.ntier.BLL.DTOs.AccessControl;
+using aspnetcore6.ntier.BLL.DTOs.General;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.AccessControl
@@ -19,32 +23,57 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRoles()
         {
             IEnumerable<RoleDTO> roles = await _roleService.GetRoles();
-            return roles == null ? NotFound() : Ok(roles);
+            var response = new ApiDataResponse<IEnumerable<RoleDTO>>(roles, "Roles retrieved succcessfully.");
+            return Ok(response);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters queryParameters)
+        {
+            PaginatedDataDTO<RoleDTO> paginatedRoles = await _roleService.GetPaginatedRoles(queryParameters.CurrentPage, queryParameters.PageSize);
+            var response = new ApiPagnatedResponse<RoleDTO>(
+                paginatedRoles.Data,
+                paginatedRoles.CurrentPage,
+                paginatedRoles.TotalPages,
+                paginatedRoles.PageSize,
+                paginatedRoles.TotalCount,
+                paginatedRoles.HasPrevious,
+                paginatedRoles.HasNext,
+                "Roles retrieved succcessfully.");
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public ActionResult<RoleDTO> GetRole(int id)
         {
             RoleDTO role = _roleService.GetRole(id);
-            return role == null ? NotFound() : Ok(role);
+            var response = new ApiDataResponse<RoleDTO>(role, "Role retrieved succcessfully.");
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> PostRole(AddRoleDTO roleDTO)
         {
-            return await _roleService.AddRole(roleDTO) ? Ok() : BadRequest();
+            await _roleService.AddRole(roleDTO);
+            var response = new ApiBaseResponse("Role created succcessfully.");
+            return Ok(response);
         }
 
         [HttpPut]
         public async Task<IActionResult> PutRole(UpdateRoleDTO roleDTO)
         {
-            return await _roleService.UpdateRole(roleDTO) ? Ok() : BadRequest();
+            await _roleService.UpdateRole(roleDTO);
+            var response = new ApiBaseResponse("Role updated succcessfully.");
+            return Ok(response);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteRole(int id)
         {
-            return await _roleService.DeleteRole(id) ? Ok() : BadRequest();
+            await _roleService.DeleteRole(id);
+            var response = new ApiBaseResponse("Role deleted succcessfully.");
+            return Ok(response);
         }
     }
 }

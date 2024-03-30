@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable enable
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl

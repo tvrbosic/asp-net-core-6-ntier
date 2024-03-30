@@ -1,7 +1,7 @@
-﻿using aspnetcore6.ntier.BLL.Utilities.Interfaces;
+﻿using aspnetcore6.ntier.BLL.Interfaces.Utilities;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

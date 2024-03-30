@@ -1,7 +1,9 @@
-﻿using aspnetcore6.ntier.BLL.Services.General.DTOs;
-using aspnetcore6.ntier.BLL.Services.General.Interfaces;
+﻿using aspnetcore6.ntier.BLL.DTOs.General;
+using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.BLL.Interfaces.General;
+using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Repositories.Interfaces;
+using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 
 namespace aspnetcore6.ntier.BLL.Services.General
@@ -24,6 +26,13 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
+        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
+        {
+            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
+            PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);
+            return paginatedDepartmentDTOs;
+        }
+
         public async Task<DepartmentDTO> GetDepartment(int id)
         {
             Department department = await _unitOfWork.Departments.GetById(id);
@@ -31,48 +40,24 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTO;
         }
 
-        public async Task<bool> AddDepartment(AddDepartmentDTO departmentDTO)
+        public async Task AddDepartment(AddDepartmentDTO departmentDTO)
         {
-            try
-            {
-                Department department = _mapper.Map<Department>(departmentDTO);
-                await _unitOfWork.Departments.Add(department);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Department department = _mapper.Map<Department>(departmentDTO);
+             await _unitOfWork.Departments.Add(department);
+             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<bool> UpdateDepartment(UpdateDepartmentDTO departmentDTO)
+        public async Task UpdateDepartment(UpdateDepartmentDTO departmentDTO)
         {
-            try
-            {
-                Department department = _mapper.Map<Department>(departmentDTO);
-                _unitOfWork.Departments.Update(department);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            Department department = _mapper.Map<Department>(departmentDTO);
+            await _unitOfWork.Departments.Update(department);
+            await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<bool> DeleteDepartment(int id)
+        public async Task DeleteDepartment(int id)
         {
-            try
-            {
-                await _unitOfWork.Departments.Delete(id);
-                return await _unitOfWork.CompleteAsync() > 0 ? true : false;
-            }
-            catch (Exception ex)
-            {
-                // TODO: Log error
-                return false;
-            }
+            await _unitOfWork.Departments.Delete(id);
+            await _unitOfWork.CompleteAsync();
         }
     }
 }
