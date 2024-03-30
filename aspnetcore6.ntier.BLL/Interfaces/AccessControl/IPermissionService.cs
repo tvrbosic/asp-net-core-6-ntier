@@ -14,7 +14,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
             string orderByProperty = "Id",
             bool ascending = true);
 
-        Task<PermissionDTO> GetPermission(int id);
+        Task<PermissionDTO?> GetPermission(int id);
 
         Task<bool> AddPermission(AddPermissionDTO permission);
 

@@ -47,9 +47,9 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return paginatedPermissionDTOs;
         }
 
-        public async Task<PermissionDTO> GetPermission(int id)
+        public async Task<PermissionDTO?> GetPermission(int id)
         {
-            Permission permission = await _unitOfWork.Permissions.GetByIdIncluding(id, p => p.Department);
+            Permission? permission = await _unitOfWork.Permissions.GetByIdIncluding(id, p => p.Department);
             PermissionDTO permissionDTO = _mapper.Map<PermissionDTO>(permission);
             return permissionDTO;
         }
