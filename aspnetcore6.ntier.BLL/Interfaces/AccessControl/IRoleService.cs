@@ -7,7 +7,13 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
     {
         Task<IEnumerable<RoleDTO>> GetRoles();
 
-        Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(int CurrentPage, int PageSize);
+        Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
+            int PageNumber,
+            int PageSize,
+            string? searchInput,
+            string[]? searchProperties,
+            string orderByProperty = "Id",
+            bool ascending = true);
 
         RoleDTO GetRole(int id);
 

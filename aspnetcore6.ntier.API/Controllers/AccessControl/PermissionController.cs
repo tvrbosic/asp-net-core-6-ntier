@@ -1,7 +1,6 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
 using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.General;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
@@ -29,17 +28,24 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
 
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters queryParameters)
+        public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<PermissionDTO> paginatedPermissions = await _permissionService.GetPaginatedPermissions(queryParameters.CurrentPage, queryParameters.PageSize);
+            PaginatedDataDTO<PermissionDTO> pp = await _permissionService.GetPaginatedPermissions(
+                qp.PageNumber,
+                qp.PageSize,
+                qp.searchInput,
+                qp.searchProperties,
+                qp.orderByProperty,
+                qp.ascending);
+
             var response = new ApiPagnatedResponse<PermissionDTO>(
-                paginatedPermissions.Data,
-                paginatedPermissions.CurrentPage,
-                paginatedPermissions.TotalPages,
-                paginatedPermissions.PageSize,
-                paginatedPermissions.TotalCount,
-                paginatedPermissions.HasPrevious,
-                paginatedPermissions.HasNext,
+                pp.Data,
+                pp.PageNumber,
+                pp.TotalPages,
+                pp.PageSize,
+                pp.TotalCount,
+                pp.HasPrevious,
+                pp.HasNext,
                 "Permissions retrieved succcessfully.");
 
             return Ok(response);

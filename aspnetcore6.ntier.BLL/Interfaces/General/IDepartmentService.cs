@@ -7,9 +7,15 @@ namespace aspnetcore6.ntier.BLL.Interfaces.General
     {
         Task<IEnumerable<DepartmentDTO>> GetDepartments();
 
-        Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(int CurrentPage, int PageSize);
+        Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
+            int PageNumber,
+            int PageSize,
+            string? searchInput,
+            string[]? searchProperties,
+            string orderByProperty = "Id",
+            bool ascending = true);
 
-        Task<DepartmentDTO> GetDepartment(int id);
+        Task<DepartmentDTO?> GetDepartment(int id);
 
         Task AddDepartment(AddDepartmentDTO department);
 

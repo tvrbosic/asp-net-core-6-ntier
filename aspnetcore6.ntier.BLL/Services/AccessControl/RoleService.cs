@@ -31,10 +31,23 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return roleDTOs;
         }
 
-        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(int PageNumber, int PageSize)
+        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
+            int PageNumber,
+            int PageSize,
+            string? searchInput,
+            string[]? searchProperties,
+            string orderByProperty = "Id",
+            bool ascending = true)
         {
-            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(PageNumber, PageSize);
+            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(
+                PageNumber,
+                PageSize,
+                searchInput,
+                searchProperties,
+                orderByProperty,
+                ascending);
             PaginatedDataDTO<RoleDTO> paginatedRoleDTOs = _mapper.Map<PaginatedDataDTO<RoleDTO>>(paginatedRoles);
+
             return paginatedRoleDTOs;
         }
 

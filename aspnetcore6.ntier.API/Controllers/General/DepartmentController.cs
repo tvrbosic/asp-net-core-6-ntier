@@ -27,17 +27,24 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters queryParameters)
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<DepartmentDTO> paginatedDepartments = await _departmentService.GetPaginatedDepartments(queryParameters.CurrentPage, queryParameters.PageSize);
+            PaginatedDataDTO<DepartmentDTO> pd = await _departmentService.GetPaginatedDepartments(
+                qp.PageNumber,
+                qp.PageSize,
+                qp.searchInput,
+                qp.searchProperties,
+                qp.orderByProperty,
+                qp.ascending);
+
             var response = new ApiPagnatedResponse<DepartmentDTO>(
-                paginatedDepartments.Data,
-                paginatedDepartments.CurrentPage,
-                paginatedDepartments.TotalPages,
-                paginatedDepartments.PageSize,
-                paginatedDepartments.TotalCount,
-                paginatedDepartments.HasPrevious,
-                paginatedDepartments.HasNext,
+                pd.Data,
+                pd.PageNumber,
+                pd.TotalPages,
+                pd.PageSize,
+                pd.TotalCount,
+                pd.HasPrevious,
+                pd.HasNext,
                 "Departments retrieved succcessfully.");
             
             return Ok(response);

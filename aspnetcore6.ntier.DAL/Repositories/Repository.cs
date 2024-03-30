@@ -1,5 +1,4 @@
-﻿#nullable enable
-using aspnetcore6.ntier.DAL.Exceptions;
+﻿using aspnetcore6.ntier.DAL.Exceptions;
 using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.Shared;
@@ -81,12 +80,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await entities.Where(predicate).ToListAsync();
         }
 
-        public async Task<TEntity> GetById(int id)
+        public async Task<TEntity?> GetById(int id)
         {
             return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity?> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsQueryable();
 

@@ -26,16 +26,29 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
-        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
+        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
+            int PageNumber,
+            int PageSize,
+            string? searchInput,
+            string[]? searchProperties,
+            string orderByProperty = "Id",
+            bool ascending = true)
         {
-            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
+            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(
+                PageNumber,
+                PageSize,
+                searchInput,
+                searchProperties,
+                orderByProperty,
+                ascending);
             PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);
+
             return paginatedDepartmentDTOs;
         }
 
-        public async Task<DepartmentDTO> GetDepartment(int id)
+        public async Task<DepartmentDTO?> GetDepartment(int id)
         {
-            Department department = await _unitOfWork.Departments.GetById(id);
+            Department? department = await _unitOfWork.Departments.GetById(id);
             DepartmentDTO departmentDTO = _mapper.Map<DepartmentDTO>(department);
             return departmentDTO;
         }
