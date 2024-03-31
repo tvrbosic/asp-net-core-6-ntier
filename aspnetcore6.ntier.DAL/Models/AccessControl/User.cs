@@ -1,13 +1,25 @@
 ﻿using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
+using System.ComponentModel.DataAnnotations;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl
 {
     public class User : BaseEntity
     {
+        [Required]
+        [MaxLength(50)]
         public string UserName { get; set; }
+        
+        [Required]
+        [MaxLength(70)]
         public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(100)]
         public string LastName { get; set; }
+        
+        [Required]
+        [MaxLength(254)]
         public string Email { get; set; }
 
         #region Navigation
