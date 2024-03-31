@@ -19,15 +19,17 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
             // Role
             CreateMap<Role, Role>();
             CreateMap<Role, RoleDTO>()
-                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionsLink.Select(pl => pl.Permission)));
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionLinks.Select(pl => pl.Permission)));
             CreateMap<PaginatedData<Role>, PaginatedDataDTO<RoleDTO>>();
             CreateMap<AddRoleDTO, Role>();
             CreateMap<UpdateRoleDTO, Role>();
 
             // User
-            //CreateMap<User, UserDTO>();
-            //CreateMap<AddUserDTO, User>();
-            //CreateMap<UpdateUserDTO, User>();
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleLinks.Select(rl => rl.Role)))
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionLinks.Select(pl => pl.Permission)));
+            CreateMap<AddUserDTO, User>();
+            CreateMap<UpdateUserDTO, User>();
 
         }
     }

@@ -20,6 +20,7 @@ public class ApiDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<PermissionRoleLink> PermissionRoleLinks { get; set; }
     public DbSet<RoleUserLink> RoleUserLinks { get; set; }
+    public DbSet<PermissionUserLink> PermissionUserLinks { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,7 @@ public class ApiDbContext : DbContext
         new BaseEntityConfiguration<User>().Configure(modelBuilder.Entity<User>());
         new BaseEntityConfiguration<PermissionRoleLink>().Configure(modelBuilder.Entity<PermissionRoleLink>());
         new BaseEntityConfiguration<RoleUserLink>().Configure(modelBuilder.Entity<RoleUserLink>());
+        new BaseEntityConfiguration<PermissionUserLink>().Configure(modelBuilder.Entity<PermissionUserLink>());
         #endregion
 
         #region General entitiy configuration
@@ -90,6 +92,11 @@ public class ApiDbContext : DbContext
             entity.HasKey(ru => ru.Id);
         });
 
+        modelBuilder.Entity<PermissionUserLink>(entity =>
+        {
+            entity.HasKey(pu => pu.Id);
+        });
+
         #endregion
 
         #region Query filters
@@ -103,6 +110,7 @@ public class ApiDbContext : DbContext
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
         modelBuilder.Entity<PermissionRoleLink>().HasQueryFilter(p => !p.IsDeleted);
         modelBuilder.Entity<RoleUserLink>().HasQueryFilter(p => !p.IsDeleted);
+        modelBuilder.Entity<PermissionUserLink>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
     }
 

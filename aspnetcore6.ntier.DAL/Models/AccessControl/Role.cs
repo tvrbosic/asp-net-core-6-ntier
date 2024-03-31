@@ -15,8 +15,8 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
         [Required]
         public Department Department { get; set; }
 
-        public ICollection<RoleUserLink> RoleUserLinks { get; set; } = new List<RoleUserLink>();
-        public ICollection<PermissionRoleLink> PermissionsLink { get; set; } = new List<PermissionRoleLink>();
+        public ICollection<RoleUserLink> UserLinks { get; set; } = new List<RoleUserLink>();
+        public ICollection<PermissionRoleLink> PermissionLinks { get; set; } = new List<PermissionRoleLink>();
         #endregion
 
     }
