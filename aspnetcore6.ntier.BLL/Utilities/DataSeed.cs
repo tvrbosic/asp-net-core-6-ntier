@@ -95,8 +95,8 @@ namespace aspnetcore6.ntier.BLL.Utilities
             { 
                 try
                 {
-                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted) 
-                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted)",
+                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted, AuditKey) 
+                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted, @AuditKey)",
                         new[]
                         {
                             new SqlParameter("@UserName", "SUPERUSER"),
@@ -104,8 +104,9 @@ namespace aspnetcore6.ntier.BLL.Utilities
                             new SqlParameter("@LastName", "USER"),
                             new SqlParameter("@Email", "super.user@email.com"),
                             new SqlParameter("@DateCreated", DateTime.UtcNow),
-                            new SqlParameter("@IsDeleted", false)
-                    });
+                            new SqlParameter("@IsDeleted", false),
+                            new SqlParameter("@AuditKey", Guid.NewGuid())
+                });
                     _logger.LogInformation("Super user account seeded successfully.");
                 }
                 catch (Exception ex)
