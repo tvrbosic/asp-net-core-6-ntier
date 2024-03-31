@@ -1,4 +1,5 @@
-﻿namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
+﻿#nullable disable
+namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
 {
     public class UpdateUserDTO
     {

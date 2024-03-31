@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,8 +24,8 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
         public string Email { get; set; }
 
         #region Navigation
-        public int? DepartmentId { get; set; }
-        public Department? Department { get; set; }
+        public int? DepartmentId { get; set; } 
+        public Department Department { get; set; } = null;
         public ICollection<RoleUserLink> RoleLinks { get; set; } = new List<RoleUserLink>();
         public ICollection<PermissionUserLink> PermissionLinks { get; set; } = new List<PermissionUserLink>();
         #endregion

@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.AccessControl;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 
 namespace aspnetcore6.ntier.BLL.DTOs.AccessControl

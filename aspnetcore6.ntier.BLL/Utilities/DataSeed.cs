@@ -235,12 +235,14 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 
                     for (int i = 1; i < 4; i++)
                     {
-                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(i);
-                        addRole.PermissionsLink.Add(new PermissionRoleLink
-                        {
-                            Role = addRole,
-                            Permission = permissionToAdd
-                        });
+                        Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(i);
+                        if (permissionToAdd != null) { 
+                            addRole.PermissionLinks.Add(new PermissionRoleLink
+                            {
+                                Role = addRole,
+                                Permission = permissionToAdd
+                            });
+                        }
                     }
 
                     await _unitOfWork.Roles.Add(addRole);

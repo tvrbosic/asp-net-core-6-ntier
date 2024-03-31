@@ -1,4 +1,5 @@
-﻿namespace aspnetcore6.ntier.BLL.DTOs.Shared
+﻿#nullable disable
+namespace aspnetcore6.ntier.BLL.DTOs.Shared
 {
     public class PaginatedDataDTO<TEntity>
     {

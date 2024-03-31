@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
 using System.ComponentModel.DataAnnotations;
 

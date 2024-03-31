@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace aspnetcore6.ntier.DAL.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20240331192138_InitialMigration")]
+    [Migration("20240331200907_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -81,6 +84,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
@@ -123,6 +129,59 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.ToTable("PermissionRoleLinks");
                 });
 
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.PermissionUserLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PermissionUserLinks");
+                });
+
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -130,6 +189,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -181,6 +243,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
@@ -230,6 +295,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -288,6 +356,40 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntityData")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Operation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -295,6 +397,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -373,13 +478,13 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("DeletedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", "Permission")
-                        .WithMany("RolesLink")
+                        .WithMany("RoleLinks")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Role", "Role")
-                        .WithMany("PermissionsLink")
+                        .WithMany("PermissionLinks")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -397,6 +502,43 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.PermissionUserLink", b =>
+                {
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "User")
+                        .WithMany("PermissionLinks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Role", b =>
@@ -439,7 +581,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("DeletedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Role", "Role")
-                        .WithMany("RoleUserLinks")
+                        .WithMany("UserLinks")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -449,7 +591,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("UpdatedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "User")
-                        .WithMany("RoleUserLinks")
+                        .WithMany("RoleLinks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -515,19 +657,21 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
                 {
-                    b.Navigation("RolesLink");
+                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Role", b =>
                 {
-                    b.Navigation("PermissionsLink");
+                    b.Navigation("PermissionLinks");
 
-                    b.Navigation("RoleUserLinks");
+                    b.Navigation("UserLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.User", b =>
                 {
-                    b.Navigation("RoleUserLinks");
+                    b.Navigation("PermissionLinks");
+
+                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>

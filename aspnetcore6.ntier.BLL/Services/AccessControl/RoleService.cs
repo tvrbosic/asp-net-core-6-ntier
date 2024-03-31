@@ -26,7 +26,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             IEnumerable<Role> roles = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
+                .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission).ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
@@ -57,7 +57,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             Role role = _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
+                .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission)
                 .Single(r => r.Id == id);
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
@@ -72,7 +72,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             {
                 Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
                 if (permissionToAdd != null) { 
-                    addRole.PermissionsLink.Add(new PermissionRoleLink
+                    addRole.PermissionLinks.Add(new PermissionRoleLink
                     {
                         Role = addRole,
                         Permission = permissionToAdd
@@ -89,7 +89,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             Role? updateRole = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
+                .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission)
                 .FirstOrDefaultAsync(r => r.Id == roleDTO.Id);
 
@@ -101,14 +101,14 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             _mapper.Map(roleDTO, updateRole);
 
             // Clear previously given permissions
-            updateRole.PermissionsLink.Clear();
+            updateRole.PermissionLinks.Clear();
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
                 Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
                 if (permissionToAdd != null)
                 {
-                    updateRole.PermissionsLink.Add(new PermissionRoleLink
+                    updateRole.PermissionLinks.Add(new PermissionRoleLink
                     {
                         Role = updateRole,
                         Permission = permissionToAdd

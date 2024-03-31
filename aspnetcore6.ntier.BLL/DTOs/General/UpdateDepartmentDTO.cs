@@ -1,4 +1,5 @@
-﻿namespace aspnetcore6.ntier.BLL.DTOs.General
+﻿#nullable disable
+namespace aspnetcore6.ntier.BLL.DTOs.General
 {
     public class UpdateDepartmentDTO
     {

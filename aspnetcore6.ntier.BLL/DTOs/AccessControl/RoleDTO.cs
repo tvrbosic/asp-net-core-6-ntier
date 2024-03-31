@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.General;
+﻿#nullable disable
+using aspnetcore6.ntier.BLL.DTOs.General;
 
 namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
 {

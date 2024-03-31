@@ -1,4 +1,5 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,11 +12,11 @@ namespace aspnetcore6.ntier.DAL.Models.General
         public string Name { get; set; }
 
         #region Navigation
-        public ICollection<User>? Users { get; set; }
+        public ICollection<User> Users { get; set; }
 
-        public ICollection<Role>? Roles { get; set; }
+        public ICollection<Role> Roles { get; set; }
 
-        public ICollection<Permission>? Permissions { get; set; }
+        public ICollection<Permission> Permissions { get; set; }
         #endregion
     }
 }
