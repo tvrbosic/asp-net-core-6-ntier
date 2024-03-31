@@ -25,8 +25,8 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
         #region Navigation
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; }
-
         public ICollection<RoleUserLink> RoleUserLinks { get; set; } = new List<RoleUserLink>();
+        public ICollection<PermissionUserLink> PermissionUserLinks { get; set; } = new List<PermissionUserLink>();
         #endregion
 
     }
