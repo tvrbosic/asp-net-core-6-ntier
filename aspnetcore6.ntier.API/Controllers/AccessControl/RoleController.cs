@@ -27,13 +27,12 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters qp)
+        public ActionResult<IEnumerable<RoleDTO>> GetPaginatedRoles([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<RoleDTO> pr = await _roleService.GetPaginatedRoles(
+            PaginatedDataDTO<RoleDTO> pr = _roleService.GetPaginatedRoles(
                 qp.PageNumber,
                 qp.PageSize,
-                qp.searchInput,
-                qp.searchProperties,
+                qp.searchText,
                 qp.orderByProperty,
                 qp.ascending);
 

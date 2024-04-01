@@ -33,19 +33,23 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return userDTOs;
         }
 
-        public async Task<PaginatedDataDTO<UserDTO>> GetPaginatedUsers(
+        public PaginatedDataDTO<UserDTO> GetPaginatedUsers(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            PaginatedData<User> paginatedUsers = await _unitOfWork.Users.GetAllPaginated(
+            Func<User, bool>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.FirstName.Contains(searchText) || p.LastName.Contains(searchText);
+            }
+
+            PaginatedData<User> paginatedUsers = _unitOfWork.Users.GetAllPaginated(
                 PageNumber,
                 PageSize,
-                searchInput,
-                searchProperties,
+                searchTextPredicate,
                 orderByProperty,
                 ascending);
             PaginatedDataDTO<UserDTO> paginatedUserDTOs = _mapper.Map<PaginatedDataDTO<UserDTO>>(paginatedUsers);

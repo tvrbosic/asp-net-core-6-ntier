@@ -27,19 +27,23 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         }
 
 
-        public async Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(
+        public PaginatedDataDTO<PermissionDTO> GetPaginatedPermissions(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            PaginatedData<Permission> paginatedPermissions = await _unitOfWork.Permissions.GetAllPaginated(
+            Func<Permission, bool>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.Name.Contains(searchText);
+            }
+
+            PaginatedData<Permission> paginatedPermissions = _unitOfWork.Permissions.GetAllPaginated(
                 PageNumber,
                 PageSize,
-                searchInput,
-                searchProperties,
+                searchTextPredicate,
                 orderByProperty,
                 ascending);
             PaginatedDataDTO<PermissionDTO> paginatedPermissionDTOs = _mapper.Map<PaginatedDataDTO<PermissionDTO>>(paginatedPermissions);

@@ -26,19 +26,23 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
-        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
+        public PaginatedDataDTO<DepartmentDTO> GetPaginatedDepartments(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(
+            Func<Department, bool>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.Name.Contains(searchText);
+            }
+
+            PaginatedData<Department> paginatedDepartments = _unitOfWork.Departments.GetAllPaginated(
                 PageNumber,
                 PageSize,
-                searchInput,
-                searchProperties,
+                searchTextPredicate,
                 orderByProperty,
                 ascending);
             PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);

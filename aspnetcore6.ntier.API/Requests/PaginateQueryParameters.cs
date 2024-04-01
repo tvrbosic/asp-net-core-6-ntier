@@ -18,8 +18,7 @@
                 _pageSize = (value > maxPageSize) ? maxPageSize : value;
             }
         }
-        public string? searchInput { get; set; } = null;
-        public string[]? searchProperties { get; set; } = null;
+        public string? searchText { get; set; } = null;
         public string orderByProperty { get; set; } = "Id";
         public bool ascending { get; set; } = true;
     }

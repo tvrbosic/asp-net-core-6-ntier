@@ -35,18 +35,22 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public async Task<PaginatedData<TEntity>> GetAllPaginated(
+        public PaginatedData<TEntity> GetAllPaginated(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            Func<TEntity, bool>? searchTextPredicate,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            var filteredEntities = SearchFilter(_dbSet.AsNoTracking(), searchInput, searchProperties);
+            var filteredEntities = _dbSet.AsNoTracking();
+            if (searchTextPredicate != null)
+            {
+                
+                filteredEntities = _dbSet.Where(searchTextPredicate).AsQueryable();
+            }
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
-            return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
+            return PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
         }
 
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
@@ -137,27 +141,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Private repository methods
-        private static IQueryable<TEntity> SearchFilter(IQueryable<TEntity> entities, string? searchInput, string[]? searchProperties)
-        {
-            IQueryable<TEntity> filteredEntities = entities;
-
-            if (!string.IsNullOrEmpty(searchInput) && searchProperties != null && searchProperties.Any())
-            {
-                foreach (var sp in searchProperties)
-                {
-                    // For each provided searchProperty check if it exists on entity type
-                    var targetProperty = entities.ElementType.GetProperty(sp);
-                    if (targetProperty != null)
-                    {
-                        // Filter entities whose searchProperty contains searchInput
-                        filteredEntities = entities.Where(e => EF.Property<string>(e, sp).Contains(searchInput));
-                    }
-                }
-            }
-
-            return filteredEntities;
-        }
-
         public IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
         {
             // Check if the orderByProperty exists in the TEntity type
