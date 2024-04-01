@@ -28,9 +28,9 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
 
 
         [HttpGet("paginated")]
-        public ActionResult<IEnumerable<PermissionDTO>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<PermissionDTO> pp = _permissionService.GetPaginatedPermissions(
+            PaginatedDataDTO<PermissionDTO> pp = await _permissionService.GetPaginatedPermissions(
                 qp.PageNumber,
                 qp.PageSize,
                 qp.searchText,

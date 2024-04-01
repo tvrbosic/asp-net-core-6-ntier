@@ -5,6 +5,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
+using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.AccessControl
 {
@@ -27,20 +28,20 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
         }
 
 
-        public PaginatedDataDTO<PermissionDTO> GetPaginatedPermissions(
+        public async Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(
             int PageNumber,
             int PageSize,
             string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            Func<Permission, bool>? searchTextPredicate = null;
+            Expression<Func<Permission, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
                 searchTextPredicate = p => p.Name.Contains(searchText);
             }
 
-            PaginatedData<Permission> paginatedPermissions = _unitOfWork.Permissions.GetAllPaginated(
+            PaginatedData<Permission> paginatedPermissions = await _unitOfWork.Permissions.GetAllPaginated(
                 PageNumber,
                 PageSize,
                 searchTextPredicate,

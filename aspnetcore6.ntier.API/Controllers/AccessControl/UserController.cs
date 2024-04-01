@@ -27,9 +27,9 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("paginated")]
-        public ActionResult<IEnumerable<UserDTO>> GetPaginatedUsers([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetPaginatedUsers([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<UserDTO> pu = _userService.GetPaginatedUsers(
+            PaginatedDataDTO<UserDTO> pu = await _userService.GetPaginatedUsers(
                 qp.PageNumber,
                 qp.PageSize,
                 qp.searchText,

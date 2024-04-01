@@ -7,6 +7,7 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.AccessControl
 {
@@ -33,20 +34,20 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return roleDTOs;
         }
 
-        public PaginatedDataDTO<RoleDTO> GetPaginatedRoles(
+        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
             int PageNumber,
             int PageSize,
             string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            Func<Role, bool>? searchTextPredicate = null;
+            Expression<Func<Role, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
                 searchTextPredicate = p => p.Name.Contains(searchText);
             }
 
-            PaginatedData<Role> paginatedRoles = _unitOfWork.Roles.GetAllPaginated(
+            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(
                 PageNumber,
                 PageSize,
                 searchTextPredicate,

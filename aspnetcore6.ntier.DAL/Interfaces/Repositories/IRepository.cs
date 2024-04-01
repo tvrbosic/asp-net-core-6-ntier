@@ -8,10 +8,10 @@ namespace aspnetcore6.ntier.DAL.Interfaces.Repositories
     {
         IQueryable<TEntity> Queryable();
         Task<IEnumerable<TEntity>> GetAll();
-        PaginatedData<TEntity> GetAllPaginated(
+        Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber, 
             int PageSize, 
-            Func<TEntity, bool>? searchTextPredicate, 
+            Expression<Func<TEntity, bool>>? searchTextPredicate, 
             string orderByProperty  = "Id", 
             bool ascending = true);
         Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes);

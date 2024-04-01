@@ -8,7 +8,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
     {
         Task<IEnumerable<UserDTO>> GetUsers();
 
-        PaginatedDataDTO<UserDTO> GetPaginatedUsers(
+        Task<PaginatedDataDTO<UserDTO>> GetPaginatedUsers(
             int PageNumber,
             int PageSize,
             string? searchText,

@@ -8,7 +8,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
     {
         Task<IEnumerable<PermissionDTO>> GetPermissions();
 
-        PaginatedDataDTO<PermissionDTO> GetPaginatedPermissions(int PageNumber,
+        Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(int PageNumber,
             int PageSize,
             string? searchText,
             string orderByProperty = "Id",

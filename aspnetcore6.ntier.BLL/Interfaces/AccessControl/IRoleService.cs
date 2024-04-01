@@ -8,7 +8,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
     {
         Task<IEnumerable<RoleDTO>> GetRoles();
 
-        PaginatedDataDTO<RoleDTO> GetPaginatedRoles(
+        Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
             int PageNumber,
             int PageSize,
             string? searchText,

@@ -7,7 +7,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.General
     {
         Task<IEnumerable<DepartmentDTO>> GetDepartments();
 
-        PaginatedDataDTO<DepartmentDTO> GetPaginatedDepartments(
+        Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
             int PageNumber,
             int PageSize,
             string? searchText,

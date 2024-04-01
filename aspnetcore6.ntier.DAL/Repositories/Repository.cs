@@ -35,10 +35,10 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public PaginatedData<TEntity> GetAllPaginated(
+        public async Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber,
             int PageSize,
-            Func<TEntity, bool>? searchTextPredicate,
+            Expression<Func<TEntity, bool>>? searchTextPredicate,
             string orderByProperty = "Id",
             bool ascending = true)
         {
@@ -50,7 +50,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             }
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
-            return PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
+            return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
         }
 
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
