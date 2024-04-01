@@ -181,55 +181,6 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PermissionUserLinks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PermissionId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    AuditKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: true),
-                    UpdatedById = table.Column<int>(type: "int", nullable: true),
-                    DeletedById = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PermissionUserLinks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PermissionUserLinks_Permissions_PermissionId",
-                        column: x => x.PermissionId,
-                        principalTable: "Permissions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PermissionUserLinks_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_PermissionUserLinks_Users_DeletedById",
-                        column: x => x.DeletedById,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_PermissionUserLinks_Users_UpdatedById",
-                        column: x => x.UpdatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_PermissionUserLinks_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PermissionRoleLinks",
                 columns: table => new
                 {
@@ -388,31 +339,6 @@ namespace aspnetcore6.ntier.DAL.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PermissionUserLinks_CreatedById",
-                table: "PermissionUserLinks",
-                column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionUserLinks_DeletedById",
-                table: "PermissionUserLinks",
-                column: "DeletedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionUserLinks_PermissionId",
-                table: "PermissionUserLinks",
-                column: "PermissionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionUserLinks_UpdatedById",
-                table: "PermissionUserLinks",
-                column: "UpdatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionUserLinks_UserId",
-                table: "PermissionUserLinks",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Roles_CreatedById",
                 table: "Roles",
                 column: "CreatedById");
@@ -518,9 +444,6 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "PermissionRoleLinks");
-
-            migrationBuilder.DropTable(
-                name: "PermissionUserLinks");
 
             migrationBuilder.DropTable(
                 name: "RoleUserLinks");

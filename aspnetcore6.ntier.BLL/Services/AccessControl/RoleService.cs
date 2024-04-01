@@ -27,7 +27,8 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                 .Queryable()
                 .Include(r => r.Department)
                 .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission).ToListAsync();
+                .ThenInclude(pl => pl.Permission)
+                .ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }

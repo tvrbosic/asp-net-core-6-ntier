@@ -11,6 +11,7 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
         public AccessControlProfile()
         {
             // Permission
+            CreateMap<Permission, Permission>();
             CreateMap<Permission, PermissionDTO>();
             CreateMap<PaginatedData<Permission>, PaginatedDataDTO<PermissionDTO>>();
             CreateMap<AddPermissionDTO, Permission>();
@@ -25,9 +26,10 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
             CreateMap<UpdateRoleDTO, Role>();
 
             // User
+            CreateMap<User, User>();
             CreateMap<User, UserDTO>()
-                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleLinks.Select(rl => rl.Role)))
-                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.PermissionLinks.Select(pl => pl.Permission)));
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleLinks.Select(rl => rl.Role)));
+            CreateMap<PaginatedData<User>, PaginatedDataDTO<UserDTO>>();
             CreateMap<AddUserDTO, User>();
             CreateMap<UpdateUserDTO, User>();
 

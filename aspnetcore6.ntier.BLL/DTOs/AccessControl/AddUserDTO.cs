@@ -9,6 +9,5 @@ namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
         public string Email { get; set; }
         public int DepartmentId { get; set; }
         public ICollection<int> RoleIds { get; set; }
-        public ICollection<int> PermissionIds { get; set; }
     }
 }

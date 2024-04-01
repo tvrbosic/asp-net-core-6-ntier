@@ -2,6 +2,7 @@
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace aspnetcore6.ntier.DAL.Models.General
 {
@@ -12,10 +13,13 @@ namespace aspnetcore6.ntier.DAL.Models.General
         public string Name { get; set; }
 
         #region Navigation
+        [JsonIgnore]
         public ICollection<User> Users { get; set; }
 
+        [JsonIgnore] 
         public ICollection<Role> Roles { get; set; }
 
+        [JsonIgnore]
         public ICollection<Permission> Permissions { get; set; }
         #endregion
     }

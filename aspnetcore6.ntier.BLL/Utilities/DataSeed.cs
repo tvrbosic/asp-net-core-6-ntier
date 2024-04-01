@@ -4,7 +4,6 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace aspnetcore6.ntier.BLL.Utilities
@@ -256,7 +255,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetAll();
             // Seed users only if there is just one user (Superuser)
-            if (users.Any() && !(users.Count() == 1))
+            if (users.Any() && users.Count() == 1)
             {
                 List<User> usersToSeed = new List<User>()
                 {
@@ -342,7 +341,25 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     }
                 };
 
-                await _unitOfWork.Users.AddRange(usersToSeed);
+                foreach (var userToSeed in usersToSeed)
+                {
+                    // Attach roles to user
+                    for (int i = 1; i < 4; i++)
+                    {
+                        Role? roleToAdd = await _unitOfWork.Roles.GetById(i);
+                        if (roleToAdd != null)
+                        {
+                            userToSeed.RoleLinks.Add(new RoleUserLink
+                            {
+                                User = userToSeed,
+                                Role = roleToAdd
+                            });
+                        }
+                    }
+
+                    await _unitOfWork.Users.Add(userToSeed);
+                }
+
                 await _unitOfWork.CompleteAsync();
             }
         }

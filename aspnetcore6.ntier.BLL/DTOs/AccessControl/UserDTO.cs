@@ -12,7 +12,6 @@ namespace aspnetcore6.ntier.BLL.DTOs.AccessControl
         public string LastName { get; set; }
         public string Email { get; set; }
         public Department Department { get; set; }
-        public IEnumerable<Role> Roles { get; set; }
-        public IEnumerable<Permission> Permissions { get; set; }
+        public IEnumerable<RoleDTO> Roles { get; set; }
     }
 }
