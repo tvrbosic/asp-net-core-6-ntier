@@ -42,14 +42,17 @@ namespace aspnetcore6.ntier.DAL.Repositories
             string orderByProperty = "Id",
             bool ascending = true)
         {
+            // Search
             var filteredEntities = _dbSet.AsNoTracking();
             if (searchTextPredicate != null)
             {
-                
                 filteredEntities = _dbSet.Where(searchTextPredicate).AsQueryable();
             }
+
+            // Order
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
+            // Paginate
             return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
         }
 

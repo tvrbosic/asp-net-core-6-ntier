@@ -38,7 +38,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             Expression<Func<Permission, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
-                searchTextPredicate = p => p.Name.Contains(searchText);
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
             }
 
             PaginatedData<Permission> paginatedPermissions = await _unitOfWork.Permissions.GetAllPaginated(

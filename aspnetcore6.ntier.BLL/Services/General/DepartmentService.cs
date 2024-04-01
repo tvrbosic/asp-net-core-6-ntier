@@ -37,7 +37,7 @@ namespace aspnetcore6.ntier.BLL.Services.General
             Expression<Func<Department, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
-                searchTextPredicate = p => p.Name.Contains(searchText);
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
             }
 
             PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(

@@ -44,7 +44,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             Expression<Func<Role, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
-                searchTextPredicate = p => p.Name.Contains(searchText);
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
             }
 
             PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(

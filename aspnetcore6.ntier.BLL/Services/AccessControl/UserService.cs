@@ -44,7 +44,11 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             Expression<Func<User, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
-                searchTextPredicate = p => p.FirstName.Contains(searchText) || p.LastName.Contains(searchText);
+                searchTextPredicate = p => 
+                    p.UserName.ToLower().Contains(searchText.ToLower()) ||
+                    p.FirstName.ToLower().Contains(searchText.ToLower()) ||
+                    p.LastName.ToLower().Contains(searchText.ToLower()) ||
+                    p.Email.ToLower().Contains(searchText.ToLower());
             }
 
             PaginatedData<User> paginatedUsers = await _unitOfWork.Users.GetAllPaginated(
