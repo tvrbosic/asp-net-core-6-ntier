@@ -1,5 +1,6 @@
 ﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
+using aspnetcore6.ntier.DAL.Models.AccessControl;
 
 namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
 {
@@ -7,9 +8,13 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
     {
         Task<IEnumerable<PermissionDTO>> GetPermissions();
 
-        Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(int CurrentPage, int PageSize);
+        Task<PaginatedDataDTO<PermissionDTO>> GetPaginatedPermissions(int PageNumber,
+            int PageSize,
+            string? searchText,
+            string orderByProperty = "Id",
+            bool ascending = true);
 
-        Task<PermissionDTO> GetPermission(int id);
+        Task<PermissionDTO?> GetPermission(int id);
 
         Task<bool> AddPermission(AddPermissionDTO permission);
 

@@ -1,11 +1,13 @@
 ﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.DAL.Exceptions;
 using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.AccessControl
 {
@@ -25,27 +27,51 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             IEnumerable<Role> roles = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
-                .ThenInclude(pl => pl.Permission).ToListAsync();
+                .Include(r => r.PermissionLinks)
+                .ThenInclude(pl => pl.Permission)
+                .ToListAsync();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }
 
-        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(int PageNumber, int PageSize)
+        public async Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
+            int PageNumber,
+            int PageSize,
+            string? searchText,
+            string orderByProperty = "Id",
+            bool ascending = true)
         {
-            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(PageNumber, PageSize);
+            Expression<Func<Role, bool>>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
+            }
+
+            PaginatedData<Role> paginatedRoles = await _unitOfWork.Roles.GetAllPaginated(
+                PageNumber,
+                PageSize,
+                searchTextPredicate,
+                orderByProperty,
+                ascending);
             PaginatedDataDTO<RoleDTO> paginatedRoleDTOs = _mapper.Map<PaginatedDataDTO<RoleDTO>>(paginatedRoles);
+
             return paginatedRoleDTOs;
         }
 
-        public RoleDTO GetRole(int id)
+        public async Task<RoleDTO> GetRole(int id)
         {
-            Role role = _unitOfWork.Roles
+            Role? role = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
+                .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission)
-                .Single(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (role == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(Role)} with id: {id}");
+            }
+
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }
@@ -56,12 +82,14 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                addRole.PermissionsLink.Add(new PermissionRoleLink
-                {
-                    Role = addRole,
-                    Permission = permissionToAdd
-                });
+                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                if (permissionToAdd != null) { 
+                    addRole.PermissionLinks.Add(new PermissionRoleLink
+                    {
+                        Role = addRole,
+                        Permission = permissionToAdd
+                    });
+                }
             }
 
             await _unitOfWork.Roles.Add(addRole);
@@ -70,27 +98,35 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> UpdateRole(UpdateRoleDTO roleDTO)
         {
-            Role updateRole = _unitOfWork.Roles
+            Role? updateRole = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
-                .Include(r => r.PermissionsLink)
+                .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission)
-                .Single(r => r.Id == roleDTO.Id);
+                .FirstOrDefaultAsync(r => r.Id == roleDTO.Id);
 
+            if (updateRole == null)
+            {
+                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(Role)} with id: {roleDTO.Id}");
+            }
 
             _mapper.Map(roleDTO, updateRole);
 
             // Clear previously given permissions
-            updateRole.PermissionsLink.Clear();
+            updateRole.PermissionLinks.Clear();
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                updateRole.PermissionsLink.Add(new PermissionRoleLink
+                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                if (permissionToAdd != null)
                 {
-                    Role = updateRole,
-                    Permission = permissionToAdd
-                });
+                    updateRole.PermissionLinks.Add(new PermissionRoleLink
+                    {
+                        Role = updateRole,
+                        Permission = permissionToAdd
+                    });
+                }
+                
             }
             await _unitOfWork.Roles.Update(updateRole);
             return await _unitOfWork.CompleteAsync() > 0;

@@ -5,6 +5,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
+using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.General
 {
@@ -26,16 +27,33 @@ namespace aspnetcore6.ntier.BLL.Services.General
             return departmentDTOs;
         }
 
-        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(int PageNumber, int PageSize)
+        public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
+            int PageNumber,
+            int PageSize,
+            string? searchText,
+            string orderByProperty = "Id",
+            bool ascending = true)
         {
-            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(PageNumber, PageSize);
+            Expression<Func<Department, bool>>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
+            }
+
+            PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(
+                PageNumber,
+                PageSize,
+                searchTextPredicate,
+                orderByProperty,
+                ascending);
             PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);
+
             return paginatedDepartmentDTOs;
         }
 
-        public async Task<DepartmentDTO> GetDepartment(int id)
+        public async Task<DepartmentDTO?> GetDepartment(int id)
         {
-            Department department = await _unitOfWork.Departments.GetById(id);
+            Department? department = await _unitOfWork.Departments.GetById(id);
             DepartmentDTO departmentDTO = _mapper.Map<DepartmentDTO>(department);
             return departmentDTO;
         }

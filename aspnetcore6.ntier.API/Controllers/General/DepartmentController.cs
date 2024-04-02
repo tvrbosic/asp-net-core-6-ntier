@@ -27,17 +27,23 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters queryParameters)
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<DepartmentDTO> paginatedDepartments = await _departmentService.GetPaginatedDepartments(queryParameters.CurrentPage, queryParameters.PageSize);
+            PaginatedDataDTO<DepartmentDTO> pd = await _departmentService.GetPaginatedDepartments(
+                qp.PageNumber,
+                qp.PageSize,
+                qp.searchText,
+                qp.orderByProperty,
+                qp.ascending);
+
             var response = new ApiPagnatedResponse<DepartmentDTO>(
-                paginatedDepartments.Data,
-                paginatedDepartments.CurrentPage,
-                paginatedDepartments.TotalPages,
-                paginatedDepartments.PageSize,
-                paginatedDepartments.TotalCount,
-                paginatedDepartments.HasPrevious,
-                paginatedDepartments.HasNext,
+                pd.Data,
+                pd.PageNumber,
+                pd.TotalPages,
+                pd.PageSize,
+                pd.TotalCount,
+                pd.HasPrevious,
+                pd.HasNext,
                 "Departments retrieved succcessfully.");
             
             return Ok(response);
@@ -46,7 +52,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDTO>> GetDepartment(int id)
         {
-            DepartmentDTO department = await _departmentService.GetDepartment(id);
+            DepartmentDTO? department = await _departmentService.GetDepartment(id);
             var response = new ApiDataResponse<DepartmentDTO>(department, "Department retrieved succcessfully.");
             return Ok(response);
         }

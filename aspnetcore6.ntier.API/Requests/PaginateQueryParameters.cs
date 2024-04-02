@@ -2,9 +2,11 @@
 {
     public class PaginateQueryParameters
     {
-        const int maxPageSize = 100;
-        public int CurrentPage { get; set; } = 1;
+        
+        const int maxPageSize = 100; // If provided page size is greater this constant will be used
         private int _pageSize = 10;
+
+        public int PageNumber { get; set; } = 1;
         public int PageSize
         {
             get
@@ -16,5 +18,8 @@
                 _pageSize = (value > maxPageSize) ? maxPageSize : value;
             }
         }
+        public string? searchText { get; set; } = null;
+        public string orderByProperty { get; set; } = "Id";
+        public bool ascending { get; set; } = true;
     }
 }

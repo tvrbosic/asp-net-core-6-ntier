@@ -1,7 +1,6 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
 using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.General;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
@@ -28,26 +27,32 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters queryParameters)
+        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters qp)
         {
-            PaginatedDataDTO<RoleDTO> paginatedRoles = await _roleService.GetPaginatedRoles(queryParameters.CurrentPage, queryParameters.PageSize);
+            PaginatedDataDTO<RoleDTO> pr = await _roleService.GetPaginatedRoles(
+                qp.PageNumber,
+                qp.PageSize,
+                qp.searchText,
+                qp.orderByProperty,
+                qp.ascending);
+
             var response = new ApiPagnatedResponse<RoleDTO>(
-                paginatedRoles.Data,
-                paginatedRoles.CurrentPage,
-                paginatedRoles.TotalPages,
-                paginatedRoles.PageSize,
-                paginatedRoles.TotalCount,
-                paginatedRoles.HasPrevious,
-                paginatedRoles.HasNext,
+                pr.Data,
+                pr.PageNumber,
+                pr.TotalPages,
+                pr.PageSize,
+                pr.TotalCount,
+                pr.HasPrevious,
+                pr.HasNext,
                 "Roles retrieved succcessfully.");
 
             return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<RoleDTO> GetRole(int id)
+        public async Task<ActionResult<RoleDTO>> GetRole(int id)
         {
-            RoleDTO role = _roleService.GetRole(id);
+            RoleDTO role = await _roleService.GetRole(id);
             var response = new ApiDataResponse<RoleDTO>(role, "Role retrieved succcessfully.");
             return Ok(response);
         }

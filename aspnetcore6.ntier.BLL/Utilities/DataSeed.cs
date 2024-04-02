@@ -4,7 +4,6 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace aspnetcore6.ntier.BLL.Utilities
@@ -95,8 +94,8 @@ namespace aspnetcore6.ntier.BLL.Utilities
             { 
                 try
                 {
-                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted) 
-                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted)",
+                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted, IsSoftDeleteProtected, AuditKey) 
+                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted, @IsSoftDeleteProtected, @AuditKey)",
                         new[]
                         {
                             new SqlParameter("@UserName", "SUPERUSER"),
@@ -104,8 +103,11 @@ namespace aspnetcore6.ntier.BLL.Utilities
                             new SqlParameter("@LastName", "USER"),
                             new SqlParameter("@Email", "super.user@email.com"),
                             new SqlParameter("@DateCreated", DateTime.UtcNow),
-                            new SqlParameter("@IsDeleted", false)
-                    });
+                            new SqlParameter("@IsDeleted", false),
+                            new SqlParameter("@IsSoftDeleteProtected", true),
+                            new SqlParameter("@AuditKey", Guid.NewGuid())
+
+                });
                     _logger.LogInformation("Super user account seeded successfully.");
                 }
                 catch (Exception ex)
@@ -235,12 +237,14 @@ namespace aspnetcore6.ntier.BLL.Utilities
                 
                     for (int i = 1; i < 4; i++)
                     {
-                        Permission permissionToAdd = await _unitOfWork.Permissions.GetById(i);
-                        addRole.PermissionsLink.Add(new PermissionRoleLink
-                        {
-                            Role = addRole,
-                            Permission = permissionToAdd
-                        });
+                        Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(i);
+                        if (permissionToAdd != null) { 
+                            addRole.PermissionLinks.Add(new PermissionRoleLink
+                            {
+                                Role = addRole,
+                                Permission = permissionToAdd
+                            });
+                        }
                     }
 
                     await _unitOfWork.Roles.Add(addRole);
@@ -253,7 +257,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetAll();
             // Seed users only if there is just one user (Superuser)
-            if (users.Any() && !(users.Count() == 1))
+            if (users.Any() && users.Count() == 1)
             {
                 List<User> usersToSeed = new List<User>()
                 {
@@ -339,7 +343,25 @@ namespace aspnetcore6.ntier.BLL.Utilities
                     }
                 };
 
-                await _unitOfWork.Users.AddRange(usersToSeed);
+                foreach (var userToSeed in usersToSeed)
+                {
+                    // Attach roles to user
+                    for (int i = 1; i < 4; i++)
+                    {
+                        Role? roleToAdd = await _unitOfWork.Roles.GetById(i);
+                        if (roleToAdd != null)
+                        {
+                            userToSeed.RoleLinks.Add(new RoleUserLink
+                            {
+                                User = userToSeed,
+                                Role = roleToAdd
+                            });
+                        }
+                    }
+
+                    await _unitOfWork.Users.Add(userToSeed);
+                }
+
                 await _unitOfWork.CompleteAsync();
             }
         }

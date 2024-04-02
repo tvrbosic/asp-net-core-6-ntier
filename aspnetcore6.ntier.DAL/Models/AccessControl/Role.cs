@@ -1,18 +1,26 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Interfaces.Abstract;
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
+using System.ComponentModel.DataAnnotations;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl
 {
-    public class Role : BaseEntity
+    public class Role : BaseEntity, ISoftDeleteProtectedEntity
     {
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
+
+        public bool IsSoftDeleteProtected { get; set; } = true;
 
         #region Navigation
         public int DepartmentId { get; set; }
+        [Required]
         public Department Department { get; set; }
 
-        public ICollection<RoleUserLink> RoleUserLinks { get; set; } = new List<RoleUserLink>();
-        public ICollection<PermissionRoleLink> PermissionsLink { get; set; } = new List<PermissionRoleLink>();
+        public ICollection<RoleUserLink> UserLinks { get; set; } = new List<RoleUserLink>();
+        public ICollection<PermissionRoleLink> PermissionLinks { get; set; } = new List<PermissionRoleLink>();
         #endregion
 
     }
