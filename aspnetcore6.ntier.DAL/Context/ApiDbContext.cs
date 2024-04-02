@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 using aspnetcore6.ntier.DAL.Interfaces.Abstract;
 using Microsoft.AspNetCore.Http;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 
 public class ApiDbContext : DbContext
 {
@@ -102,8 +101,6 @@ public class ApiDbContext : DbContext
         #endregion
 
         #region Query filters
-
-
         // =======================================| SOFT DELETE |======================================= //
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
@@ -232,7 +229,7 @@ public class ApiDbContext : DbContext
         if (authenticatedUserName != null)
         {
             // AsEnumberable is required because of previously configured query filter on Users table
-            IEnumerable<ApplicationUser> findUserResult = this.Users.AsEnumerable().Where(u => u.UserName.Equals(authenticatedUserName));
+            IEnumerable<ApplicationUser> findUserResult = this.Users.AsEnumerable().Where(u => u.UserName.ToLower().Equals(authenticatedUserName.ToLower()));
 
             if (findUserResult.Any())
             {

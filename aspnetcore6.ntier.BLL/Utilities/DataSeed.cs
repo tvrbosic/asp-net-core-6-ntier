@@ -86,10 +86,12 @@ namespace aspnetcore6.ntier.BLL.Utilities
         #endregion
 
         #region Create seed mock HTTP context
+        /// <summary>
+        /// Configure and create mock IHttpContextAccessor to simulate authenticated user. User which will be used as author of seed data is SUPERUSER.
+        /// This is required due to global base entity and audit log data population in ApiDbContext.
+        /// </summary>
         private void CreateSeedHttpContext()
         {
-
-            // Configure and create mock IHttpContextAccessor required so that data could be seeded with mocked user
             var httpContext = new DefaultHttpContext();
 
             httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
