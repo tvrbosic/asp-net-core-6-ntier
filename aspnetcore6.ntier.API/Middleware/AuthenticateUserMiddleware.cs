@@ -31,11 +31,5 @@ namespace aspnetcore6.ntier.API.Middleware
 
             await _next(context);
         }
-
-        private int GetUserIdFromWherever()
-        {
-            // Logic to retrieve user ID from wherever it's stored
-            return 2; // Replace with actual implementation
-        }
     }
 }
