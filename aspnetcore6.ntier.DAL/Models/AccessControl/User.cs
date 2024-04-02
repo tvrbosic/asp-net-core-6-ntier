@@ -1,10 +1,12 @@
-﻿using aspnetcore6.ntier.DAL.Models.Abstract;
+﻿#nullable disable
+using aspnetcore6.ntier.DAL.Interfaces.Abstract;
+using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
 using System.ComponentModel.DataAnnotations;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl
 {
-    public class User : BaseEntity
+    public class User : BaseEntity, ISoftDeleteProtectedEntity
     {
         [Required]
         [MaxLength(50)]
@@ -22,11 +24,12 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
         [MaxLength(254)]
         public string Email { get; set; }
 
-        #region Navigation
-        public int? DepartmentId { get; set; }
-        public Department? Department { get; set; }
+        public bool IsSoftDeleteProtected { get; set; } = true;
 
-        public ICollection<RoleUserLink> RoleUserLinks { get; set; } = new List<RoleUserLink>();
+        #region Navigation
+        public int? DepartmentId { get; set; } 
+        public Department? Department { get; set; } = null;
+        public ICollection<RoleUserLink> RoleLinks { get; set; } = new List<RoleUserLink>();
         #endregion
 
     }

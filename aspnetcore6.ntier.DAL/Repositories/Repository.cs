@@ -3,6 +3,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.DAL.Repositories
@@ -38,14 +39,21 @@ namespace aspnetcore6.ntier.DAL.Repositories
         public async Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            Expression<Func<TEntity, bool>>? searchTextPredicate,
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            var filteredEntities = SearchFilter(_dbSet.AsNoTracking(), searchInput, searchProperties);
+            // Search
+            var filteredEntities = _dbSet.AsNoTracking();
+            if (searchTextPredicate != null)
+            {
+                filteredEntities = _dbSet.Where(searchTextPredicate).AsQueryable();
+            }
+
+            // Order
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
+            // Paginate
             return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
         }
 
@@ -64,7 +72,13 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbSet.Where(predicate).ToListAsync();
+            IEnumerable<TEntity> result = await _dbSet.Where(predicate).ToListAsync();
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
@@ -76,12 +90,26 @@ namespace aspnetcore6.ntier.DAL.Repositories
                 entities = entities.Include(include);
             }
 
-            return await entities.Where(predicate).ToListAsync();
+            IEnumerable<TEntity> result = await entities.Where(predicate).ToListAsync();
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
+            }
+
+            return result;
         }
 
         public async Task<TEntity?> GetById(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+            TEntity? result = await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(TEntity)} with id: {id}");
+            }
+
+            return result;
         }
 
         public async Task<TEntity?> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
@@ -93,7 +121,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
                 entities = entities.Include(include);
             }
 
-            return await entities.FirstOrDefaultAsync(e => e.Id == id);
+            TEntity? result = await entities.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(TEntity)} with id: {id}");
+            }
+
+            return result;
         }
 
         public async Task Add(TEntity entity)
@@ -137,27 +172,6 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Private repository methods
-        private static IQueryable<TEntity> SearchFilter(IQueryable<TEntity> entities, string? searchInput, string[]? searchProperties)
-        {
-            IQueryable<TEntity> filteredEntities = entities;
-
-            if (!string.IsNullOrEmpty(searchInput) && searchProperties != null && searchProperties.Any())
-            {
-                foreach (var sp in searchProperties)
-                {
-                    // For each provided searchProperty check if it exists on entity type
-                    var targetProperty = entities.ElementType.GetProperty(sp);
-                    if (targetProperty != null)
-                    {
-                        // Filter entities whose searchProperty contains searchInput
-                        filteredEntities = entities.Where(e => EF.Property<string>(e, sp).Contains(searchInput));
-                    }
-                }
-            }
-
-            return filteredEntities;
-        }
-
         public IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
         {
             // Check if the orderByProperty exists in the TEntity type

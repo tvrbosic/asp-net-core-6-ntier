@@ -4,23 +4,23 @@ using aspnetcore6.ntier.DAL.Models.AccessControl;
 
 namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
 {
-    public interface IRoleService
+    public interface IUserService
     {
-        Task<IEnumerable<RoleDTO>> GetRoles();
+        Task<IEnumerable<UserDTO>> GetUsers();
 
-        Task<PaginatedDataDTO<RoleDTO>> GetPaginatedRoles(
+        Task<PaginatedDataDTO<UserDTO>> GetPaginatedUsers(
             int PageNumber,
             int PageSize,
             string? searchText,
             string orderByProperty = "Id",
             bool ascending = true);
 
-        Task<RoleDTO> GetRole(int id);
+        Task<UserDTO> GetUser(int id);
 
-        Task<bool> AddRole(AddRoleDTO role);
+        Task<bool> AddUser(AddUserDTO role);
 
-        Task<bool> UpdateRole(UpdateRoleDTO role);
+        Task<bool> UpdateUser(UpdateUserDTO role);
 
-        Task<bool> DeleteRole(int id);
+        Task<bool> DeleteUser(int id);
     }
 }

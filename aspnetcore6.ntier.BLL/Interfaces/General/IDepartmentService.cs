@@ -10,8 +10,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.General
         Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            string? searchText,
             string orderByProperty = "Id",
             bool ascending = true);
 

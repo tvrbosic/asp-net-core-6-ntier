@@ -53,6 +53,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSoftDeleteProtected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -157,6 +160,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -275,6 +281,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSoftDeleteProtected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -364,6 +373,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSoftDeleteProtected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -423,13 +435,13 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("DeletedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", "Permission")
-                        .WithMany("RolesLink")
+                        .WithMany("RoleLinks")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Role", "Role")
-                        .WithMany("PermissionsLink")
+                        .WithMany("PermissionLinks")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -489,7 +501,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("DeletedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.Role", "Role")
-                        .WithMany("RoleUserLinks")
+                        .WithMany("UserLinks")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -499,7 +511,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasForeignKey("UpdatedById");
 
                     b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "User")
-                        .WithMany("RoleUserLinks")
+                        .WithMany("RoleLinks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -565,19 +577,19 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
                 {
-                    b.Navigation("RolesLink");
+                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Role", b =>
                 {
-                    b.Navigation("PermissionsLink");
+                    b.Navigation("PermissionLinks");
 
-                    b.Navigation("RoleUserLinks");
+                    b.Navigation("UserLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.User", b =>
                 {
-                    b.Navigation("RoleUserLinks");
+                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>

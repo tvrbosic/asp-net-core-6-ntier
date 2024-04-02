@@ -32,8 +32,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
             PaginatedDataDTO<DepartmentDTO> pd = await _departmentService.GetPaginatedDepartments(
                 qp.PageNumber,
                 qp.PageSize,
-                qp.searchInput,
-                qp.searchProperties,
+                qp.searchText,
                 qp.orderByProperty,
                 qp.ascending);
 

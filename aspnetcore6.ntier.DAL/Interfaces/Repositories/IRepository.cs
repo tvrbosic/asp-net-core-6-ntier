@@ -11,8 +11,7 @@ namespace aspnetcore6.ntier.DAL.Interfaces.Repositories
         Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber, 
             int PageSize, 
-            string? searchInput, 
-            string[]? searchProperties, 
+            Expression<Func<TEntity, bool>>? searchTextPredicate, 
             string orderByProperty  = "Id", 
             bool ascending = true);
         Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes);

@@ -5,6 +5,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
+using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.General
 {
@@ -29,16 +30,20 @@ namespace aspnetcore6.ntier.BLL.Services.General
         public async Task<PaginatedDataDTO<DepartmentDTO>> GetPaginatedDepartments(
             int PageNumber,
             int PageSize,
-            string? searchInput,
-            string[]? searchProperties,
+            string? searchText,
             string orderByProperty = "Id",
             bool ascending = true)
         {
+            Expression<Func<Department, bool>>? searchTextPredicate = null;
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchTextPredicate = p => p.Name.ToLower().Contains(searchText.ToLower());
+            }
+
             PaginatedData<Department> paginatedDepartments = await _unitOfWork.Departments.GetAllPaginated(
                 PageNumber,
                 PageSize,
-                searchInput,
-                searchProperties,
+                searchTextPredicate,
                 orderByProperty,
                 ascending);
             PaginatedDataDTO<DepartmentDTO> paginatedDepartmentDTOs = _mapper.Map<PaginatedDataDTO<DepartmentDTO>>(paginatedDepartments);

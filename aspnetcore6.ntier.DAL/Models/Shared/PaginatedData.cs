@@ -25,7 +25,7 @@ namespace aspnetcore6.ntier.DAL.Models.Shared
 
         public static async Task<PaginatedData<TEntity>> ToPaginatedData(IQueryable<TEntity> source, int pageNumber, int pageSize)
         {
-            var count = source.Count();
+            var count = await source.CountAsync();
             var entities = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return new PaginatedData<TEntity>(entities, count, pageNumber, pageSize);

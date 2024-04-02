@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable disable
+using Microsoft.EntityFrameworkCore;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
+using aspnetcore6.ntier.DAL.Interfaces.Abstract;
 
 public class ApiDbContext : DbContext
 {
@@ -95,14 +97,14 @@ public class ApiDbContext : DbContext
         #endregion
 
         #region Query filters
-        // =======================================| SUPERUSER |======================================= //
-        modelBuilder.Entity<User>().HasQueryFilter(u => u.UserName == "SUPERUSER");
+        // =======================================| SUPERUSER + SOFT DELETE  |======================================= //
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.UserName.Equals("SUPERUSER") && !u.IsDeleted);
+
 
         // =======================================| SOFT DELETE |======================================= //
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
-        modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
-        modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
+        modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<PermissionRoleLink>().HasQueryFilter(p => !p.IsDeleted);
         modelBuilder.Entity<RoleUserLink>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
@@ -164,10 +166,7 @@ public class ApiDbContext : DbContext
                 if(!navigationEntry.IsLoaded) navigationEntry.Load();
                 foreach (var dependentEntry in collectionEntry.CurrentValue)
                 {
-                    Entry(dependentEntry).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
-                    Entry(dependentEntry).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
-                    Entry(dependentEntry).Property("IsDeleted").CurrentValue = true;
-                    Entry(dependentEntry).State = EntityState.Modified;
+                    SoftDeleteIfNotProtected(dependentEntry);
                 }
             }
             else
@@ -175,13 +174,9 @@ public class ApiDbContext : DbContext
                 var dependentEntry = navigationEntry.CurrentValue;
                 if (dependentEntry != null)
                 {
-                    Entry(dependentEntry).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
-                    Entry(dependentEntry).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
-                    Entry(dependentEntry).Property("IsDeleted").CurrentValue = true;
-                    Entry(dependentEntry).State = EntityState.Modified;
+                    SoftDeleteIfNotProtected(dependentEntry);
                 }
             }
-
         }
     }
 
@@ -209,6 +204,18 @@ public class ApiDbContext : DbContext
             }).ToList();
 
         AuditLogs.AddRange(auditLogEntries);
+    }
+
+    private void SoftDeleteIfNotProtected(object entity)
+    {
+        var isSoftDeleteProtected = entity is ISoftDeleteProtectedEntity protectedEntity && protectedEntity.IsSoftDeleteProtected;
+        if (!isSoftDeleteProtected)
+        {
+            Entry(entity).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+            Entry(entity).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
+            Entry(entity).Property("IsDeleted").CurrentValue = true;
+            Entry(entity).State = EntityState.Modified;
+        }
     }
     #endregion
 }
