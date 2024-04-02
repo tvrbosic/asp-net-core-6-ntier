@@ -58,14 +58,20 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return paginatedRoleDTOs;
         }
 
-        public RoleDTO GetRole(int id)
+        public async Task<RoleDTO> GetRole(int id)
         {
-            Role role = _unitOfWork.Roles
+            Role? role = await _unitOfWork.Roles
                 .Queryable()
                 .Include(r => r.Department)
                 .Include(r => r.PermissionLinks)
                 .ThenInclude(pl => pl.Permission)
-                .Single(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (role == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(Role)} with id: {id}");
+            }
+
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }

@@ -97,14 +97,14 @@ public class ApiDbContext : DbContext
         #endregion
 
         #region Query filters
-        // =======================================| SUPERUSER |======================================= //
-        modelBuilder.Entity<User>().HasQueryFilter(u => u.UserName == "SUPERUSER");
+        // =======================================| SUPERUSER + SOFT DELETE  |======================================= //
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.UserName.Equals("SUPERUSER") && !u.IsDeleted);
+
 
         // =======================================| SOFT DELETE |======================================= //
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
-        modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
-        modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted);
+        modelBuilder.Entity<Role>().HasQueryFilter(r => !r.IsDeleted);
         modelBuilder.Entity<PermissionRoleLink>().HasQueryFilter(p => !p.IsDeleted);
         modelBuilder.Entity<RoleUserLink>().HasQueryFilter(p => !p.IsDeleted);
         #endregion

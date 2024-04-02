@@ -3,6 +3,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.DAL.Repositories
@@ -71,7 +72,13 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return await _dbSet.Where(predicate).ToListAsync();
+            IEnumerable<TEntity> result = await _dbSet.Where(predicate).ToListAsync();
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
@@ -83,12 +90,26 @@ namespace aspnetcore6.ntier.DAL.Repositories
                 entities = entities.Include(include);
             }
 
-            return await entities.Where(predicate).ToListAsync();
+            IEnumerable<TEntity> result = await entities.Where(predicate).ToListAsync();
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
+            }
+
+            return result;
         }
 
         public async Task<TEntity?> GetById(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+            TEntity? result = await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(TEntity)} with id: {id}");
+            }
+
+            return result;
         }
 
         public async Task<TEntity?> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
@@ -100,7 +121,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
                 entities = entities.Include(include);
             }
 
-            return await entities.FirstOrDefaultAsync(e => e.Id == id);
+            TEntity? result = await entities.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (result == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(TEntity)} with id: {id}");
+            }
+
+            return result;
         }
 
         public async Task Add(TEntity entity)

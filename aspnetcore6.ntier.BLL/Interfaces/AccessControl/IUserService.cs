@@ -15,7 +15,7 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
             string orderByProperty = "Id",
             bool ascending = true);
 
-        UserDTO GetUser(int id);
+        Task<UserDTO> GetUser(int id);
 
         Task<bool> AddUser(AddUserDTO role);
 

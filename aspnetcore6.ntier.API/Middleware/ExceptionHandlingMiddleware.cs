@@ -69,7 +69,7 @@ namespace aspnetcore6.ntier.API.Middleware
                     statusCode = HttpStatusCode.BadRequest;
                     returnErrorMessage = "The request data is not in the expected format.";
                     break;
-                case EntityNotFoundException:
+                case EntityNotFoundException: // THIS IS CUSTOM EXCEPTION
                     logLevel = LogLevel.Warning;
                     logErrorMessage = exception.Message;
                     statusCode = HttpStatusCode.BadRequest;

@@ -62,25 +62,30 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return paginatedUserDTOs;
         }
 
-        public UserDTO GetUser(int id)
+        public async Task<UserDTO> GetUser(int id)
         {
-            User role = _unitOfWork.Users
+            User? user = await _unitOfWork.Users
                 .Queryable()
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
                 .ThenInclude(pl => pl.Role)
-                .Single(u => u.Id == id);
-            UserDTO roleDTO = _mapper.Map<UserDTO>(role);
-            return roleDTO;
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(User)} with id: {id}");
+            }
+
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
+            return userDTO;
         }
 
-        public async Task<bool> AddUser(AddUserDTO roleDTO)
+        public async Task<bool> AddUser(AddUserDTO userDTO)
         {
-            // TODO: THIS METHOD IS COPY PASTED AND SHOULD BE MODIFIED
-            User addUser = _mapper.Map<User>(roleDTO);
+            User addUser = _mapper.Map<User>(userDTO);
 
             // Add roles to user from provided roleIds
-            foreach (int roleId in roleDTO.RoleIds)
+            foreach (int roleId in userDTO.RoleIds)
             {
                 Role? roleToAdd = await _unitOfWork.Roles.GetById(roleId);
                 if (roleToAdd != null)
@@ -97,27 +102,26 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             return await _unitOfWork.CompleteAsync() > 0;
         }
 
-        public async Task<bool> UpdateUser(UpdateUserDTO roleDTO)
+        public async Task<bool> UpdateUser(UpdateUserDTO userDTO)
         {
-            // TODO: THIS METHOD IS COPY PASTED AND SHOULD BE MODIFIED
             User? updateUser = await _unitOfWork.Users
                 .Queryable()
                 .Include(r => r.Department)
                 .Include(r => r.RoleLinks)
                 .ThenInclude(rl => rl.Role)
-                .FirstOrDefaultAsync(r => r.Id == roleDTO.Id);
+                .FirstOrDefaultAsync(r => r.Id == userDTO.Id);
 
             if (updateUser == null)
             {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(User)} with id: {roleDTO.Id}");
+                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(User)} with id: {userDTO.Id}");
             }
 
-            _mapper.Map(roleDTO, updateUser);
+            _mapper.Map(userDTO, updateUser);
 
             // Clear previously given permissions
             updateUser.RoleLinks.Clear();
 
-            foreach (int roleId in roleDTO.RoleIds)
+            foreach (int roleId in userDTO.RoleIds)
             {
                 Role? roleToAdd = await _unitOfWork.Roles.GetById(roleId);
                 if (roleToAdd != null)
