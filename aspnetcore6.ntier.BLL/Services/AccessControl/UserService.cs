@@ -1,7 +1,7 @@
 ﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
 using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Exceptions;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.DAL.Exceptions;
 using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.Shared;
@@ -73,11 +73,13 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             if (user == null)
             {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(User)} with id: {id}");
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(User)} with id: {id}");
             }
-
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-            return userDTO;
+            else
+            {
+                UserDTO userDTO = _mapper.Map<UserDTO>(user);
+                return userDTO;
+            }
         }
 
         public async Task<bool> AddUser(AddUserDTO userDTO)
