@@ -1,15 +1,18 @@
 ﻿#nullable disable
+using aspnetcore6.ntier.DAL.Interfaces.Abstract;
 using aspnetcore6.ntier.DAL.Models.Abstract;
 using aspnetcore6.ntier.DAL.Models.General;
 using System.ComponentModel.DataAnnotations;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl
 {
-    public class Role : BaseEntity
+    public class Role : BaseEntity, ISoftDeleteProtectedEntity
     {
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }
+
+        public bool IsSoftDeleteProtected { get; set; } = true;
 
         #region Navigation
         public int DepartmentId { get; set; }

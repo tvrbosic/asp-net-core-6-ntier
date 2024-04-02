@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace aspnetcore6.ntier.DAL.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20240401120544_InitialMigration")]
+    [Migration("20240402082621_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -159,6 +162,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -275,6 +281,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("nvarchar(70)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")

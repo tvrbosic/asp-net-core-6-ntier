@@ -53,6 +53,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSoftDeleteProtected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -157,6 +160,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -273,6 +279,9 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .HasColumnType("nvarchar(70)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
