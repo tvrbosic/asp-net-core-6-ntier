@@ -50,9 +50,9 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public ActionResult<UserDTO> GetUser(int id)
+        public async Task<ActionResult<UserDTO>> GetUser(int id)
         {
-            UserDTO user = _userService.GetUser(id);
+            UserDTO user = await _userService.GetUser(id);
             var response = new ApiDataResponse<UserDTO>(user, "User retrieved succcessfully.");
             return Ok(response);
         }

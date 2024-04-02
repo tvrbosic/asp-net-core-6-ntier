@@ -50,9 +50,9 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public ActionResult<RoleDTO> GetRole(int id)
+        public async Task<ActionResult<RoleDTO>> GetRole(int id)
         {
-            RoleDTO role = _roleService.GetRole(id);
+            RoleDTO role = await _roleService.GetRole(id);
             var response = new ApiDataResponse<RoleDTO>(role, "Role retrieved succcessfully.");
             return Ok(response);
         }
