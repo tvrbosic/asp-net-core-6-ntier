@@ -1,14 +1,15 @@
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using aspnetcore6.ntier.API.Middleware;
 using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
 using aspnetcore6.ntier.BLL.Interfaces.General;
 using aspnetcore6.ntier.BLL.Interfaces.Utilities;
-using aspnetcore6.ntier.BLL.Services.AccessControl;
 using aspnetcore6.ntier.BLL.Services.General;
 using aspnetcore6.ntier.BLL.Utilities;
 using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using aspnetcore6.ntier.BLL.Services.AccessControl;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -39,23 +40,36 @@ builder.Logging.AddSerilog(logger);
 
 #region ASP.NET and third party services
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+
+// =======================================| SWAGGER |======================================= //
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// =======================================| AUTHENTICATION |======================================= //
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+   .AddNegotiate();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+
 #endregion
 
 #region Application services registration
-// Repositories
+// =======================================| REPOSITORIES |======================================= //
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Services
+// =======================================| SERVICES |======================================= //
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Utility
+// =======================================| UTILITY |======================================= //
 builder.Services.AddScoped<IDataSeed, DataSeed>();
 #endregion
 
@@ -88,8 +102,11 @@ using (var scope = app.Services.CreateScope())
 
 #region Configure the HTTP request pipeline
 // REMINDER: Keep in mind that middleware invoking order is important!
-// Global exception handler
+
+// Global exception handler (should be at the top)
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+// Authentication middleware (check if windows authenticated user exists in database)
+app.UseMiddleware<AuthenticateUserMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -99,6 +116,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

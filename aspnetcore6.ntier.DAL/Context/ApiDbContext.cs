@@ -7,11 +7,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 using aspnetcore6.ntier.DAL.Interfaces.Abstract;
+using Microsoft.AspNetCore.Http;
 
 public class ApiDbContext : DbContext
 {
-    public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public ApiDbContext(DbContextOptions<ApiDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
     }
     #region General entity registration
     public DbSet<Department> Departments { get; set; }
@@ -111,7 +115,7 @@ public class ApiDbContext : DbContext
     }
 
     // =======================================| IMPORTANT |======================================= //
-    #region Global context configuration and method overrides
+    #region Global context configuration, method overrides, utility methods
     public override int SaveChanges()
     {
         ProcessChangetrackerEntries();
@@ -138,15 +142,15 @@ public class ApiDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Property("CreatedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    entry.Property("CreatedById").CurrentValue = GetAuthenticatedUserId();
                     entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
                     break;
                 case EntityState.Modified:
-                    entry.Property("UpdatedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    entry.Property("UpdatedById").CurrentValue = GetAuthenticatedUserId();
                     entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
                     break;
                 case EntityState.Deleted:
-                    entry.Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+                    entry.Property("DeletedById").CurrentValue = GetAuthenticatedUserId();
                     entry.Property("DateDeleted").CurrentValue = DateTime.UtcNow;
                     entry.Property("IsDeleted").CurrentValue = true;
                     entry.State = EntityState.Modified;
@@ -189,9 +193,8 @@ public class ApiDbContext : DbContext
                 var entryData = JsonSerializer.Serialize(e.Properties.ToDictionary(p => p.Metadata.Name, p => p.CurrentValue));
                 var newAuditLog = new AuditLog
                 {
-                    AuditKey = (Guid) e.Properties.Where(p => p.Metadata.Name.ToUpper() == "AUDITKEY").Select(p => p.CurrentValue).FirstOrDefault(),
-                    UserId = 1, // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
-                    UserName = "SUPERUSER", // TODO: Mock set of application user name. Replace with user name from HTTP request.
+                    AuditKey = (Guid)e.Properties.Where(p => p.Metadata.Name.ToUpper() == "AUDITKEY").Select(p => p.CurrentValue).FirstOrDefault(),
+                    UserId = GetAuthenticatedUserId(),
                     Operation = (Boolean) e.Properties
                         .Where(p => p.Metadata.Name.ToUpper() == "ISDELETED")
                         .Select(p => p.CurrentValue)
@@ -211,10 +214,23 @@ public class ApiDbContext : DbContext
         var isSoftDeleteProtected = entity is ISoftDeleteProtectedEntity protectedEntity && protectedEntity.IsSoftDeleteProtected;
         if (!isSoftDeleteProtected)
         {
-            Entry(entity).Property("DeletedById").CurrentValue = 1; // TODO: Mock set of application user ID. Replace with user ID from HTTP request.
+            Entry(entity).Property("DeletedById").CurrentValue = GetAuthenticatedUserId();
             Entry(entity).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
             Entry(entity).Property("IsDeleted").CurrentValue = true;
             Entry(entity).State = EntityState.Modified;
+        }
+    }
+
+    private int GetAuthenticatedUserId()
+    {
+        // Retrieve user ID from HttpContext.Items
+        if (_httpContextAccessor.HttpContext.Items.ContainsKey("AuthenticatedUserId"))
+        {
+            return (int)_httpContextAccessor.HttpContext.Items["AuthenticatedUserId"];
+        }
+        else
+        {
+            throw new UnauthorizedAccessException("Database context is unable to read AuthenticatedUserId from HTTP context!");
         }
     }
     #endregion

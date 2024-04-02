@@ -5,6 +5,7 @@ using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.General;
 using aspnetcore6.ntier.DAL.Models.Shared;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.BLL.Services.General

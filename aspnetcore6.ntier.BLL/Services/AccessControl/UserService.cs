@@ -82,6 +82,22 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             }
         }
 
+        public async Task<UserDTO> GetUserByUsername(string userName)
+        {
+            IEnumerable<User> users = await _unitOfWork.Users.Find(u => u.UserName.Equals(userName));
+            var user = users.FirstOrDefault();
+
+            if (user == null)
+            {
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(User)} with username: {userName}");
+            }
+            else
+            {
+                UserDTO userDTO = _mapper.Map<UserDTO>(user);
+                return userDTO;
+            }
+        }
+
         public async Task<bool> AddUser(AddUserDTO userDTO)
         {
             User addUser = _mapper.Map<User>(userDTO);
