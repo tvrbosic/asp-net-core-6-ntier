@@ -12,7 +12,7 @@ namespace aspnetcore6.ntier.DAL.Models.AccessControl
         public Role Role { get; set; }
         public int UserId { get; set; }
         [Required]
-        public User User { get; set; }
+        public ApplicationUser User { get; set; }
         #endregion
     }
 }

@@ -9,6 +9,7 @@ namespace aspnetcore6.ntier.DAL.Models.General
         public int Id { get; set; }
         public Guid AuditKey { get; set; }
         public int UserId { get; set; }
+        public string Username { get; set; }
         public string Operation { get; set; }
         public DateTime Timestamp { get; set; }
         public string EntityName { get; set; }

@@ -24,7 +24,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            IEnumerable<User> users = await _unitOfWork.Users
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users
                 .Queryable()
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
@@ -41,7 +41,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             string orderByProperty = "Id",
             bool ascending = true)
         {
-            Expression<Func<User, bool>>? searchTextPredicate = null;
+            Expression<Func<ApplicationUser, bool>>? searchTextPredicate = null;
             if (!string.IsNullOrEmpty(searchText))
             {
                 searchTextPredicate = p => 
@@ -51,7 +51,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
                     p.Email.ToLower().Contains(searchText.ToLower());
             }
 
-            PaginatedData<User> paginatedUsers = await _unitOfWork.Users.GetAllPaginated(
+            PaginatedData<ApplicationUser> paginatedUsers = await _unitOfWork.Users.GetAllPaginated(
                 PageNumber,
                 PageSize,
                 searchTextPredicate,
@@ -64,7 +64,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<UserDTO> GetUser(int id)
         {
-            User? user = await _unitOfWork.Users
+            ApplicationUser? user = await _unitOfWork.Users
                 .Queryable()
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
@@ -73,7 +73,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             if (user == null)
             {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(User)} with id: {id}");
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(ApplicationUser)} with id: {id}");
             }
             else
             {
@@ -84,12 +84,12 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<UserDTO> GetUserByUsername(string userName)
         {
-            IEnumerable<User> users = await _unitOfWork.Users.Find(u => u.UserName.Equals(userName));
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.Find(u => u.UserName.Equals(userName));
             var user = users.FirstOrDefault();
 
             if (user == null)
             {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(User)} with username: {userName}");
+                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(ApplicationUser)} with username: {userName}");
             }
             else
             {
@@ -100,7 +100,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> AddUser(AddUserDTO userDTO)
         {
-            User addUser = _mapper.Map<User>(userDTO);
+            ApplicationUser addUser = _mapper.Map<ApplicationUser>(userDTO);
 
             // Add roles to user from provided roleIds
             foreach (int roleId in userDTO.RoleIds)
@@ -122,7 +122,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> UpdateUser(UpdateUserDTO userDTO)
         {
-            User? updateUser = await _unitOfWork.Users
+            ApplicationUser? updateUser = await _unitOfWork.Users
                 .Queryable()
                 .Include(r => r.Department)
                 .Include(r => r.RoleLinks)
@@ -131,7 +131,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             if (updateUser == null)
             {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(User)} with id: {userDTO.Id}");
+                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(ApplicationUser)} with id: {userDTO.Id}");
             }
 
             _mapper.Map(userDTO, updateUser);

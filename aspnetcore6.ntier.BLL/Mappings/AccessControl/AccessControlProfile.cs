@@ -26,12 +26,12 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
             CreateMap<UpdateRoleDTO, Role>();
 
             // User
-            CreateMap<User, User>();
-            CreateMap<User, UserDTO>()
+            CreateMap<ApplicationUser, ApplicationUser>();
+            CreateMap<ApplicationUser, UserDTO>()
                 .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleLinks.Select(rl => rl.Role)));
-            CreateMap<PaginatedData<User>, PaginatedDataDTO<UserDTO>>();
-            CreateMap<AddUserDTO, User>();
-            CreateMap<UpdateUserDTO, User>();
+            CreateMap<PaginatedData<ApplicationUser>, PaginatedDataDTO<UserDTO>>();
+            CreateMap<AddUserDTO, ApplicationUser>();
+            CreateMap<UpdateUserDTO, ApplicationUser>();
 
         }
     }

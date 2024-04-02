@@ -16,7 +16,7 @@ namespace aspnetcore6.ntier.DAL.Models.General
 
         #region Navigation
         [JsonIgnore]
-        public ICollection<User> Users { get; set; }
+        public ICollection<ApplicationUser> Users { get; set; }
 
         [JsonIgnore] 
         public ICollection<Role> Roles { get; set; }

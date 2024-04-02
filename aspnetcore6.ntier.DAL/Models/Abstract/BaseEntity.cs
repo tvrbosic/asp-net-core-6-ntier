@@ -25,13 +25,13 @@ namespace aspnetcore6.ntier.DAL.Models.Abstract
 
         #region Navigation
         public int? CreatedById { get; set; }
-        public User? CreatedBy { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
 
         public int? UpdatedById { get; set; }
-        public User? UpdatedBy { get; set; }
+        public ApplicationUser? UpdatedBy { get; set; }
 
         public int? DeletedById { get; set; }
-        public User? DeletedBy { get; set; }
+        public ApplicationUser? DeletedBy { get; set; }
         #endregion
     }
 }

@@ -13,7 +13,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Access control entity registration
-        public IRepository<User> Users{ get; }
+        public IRepository<ApplicationUser> Users{ get; }
         public IRepository<Role> Roles { get; }
         public IRepository<Permission> Permissions { get; }
         #endregion
@@ -22,7 +22,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
         {
             _context = context;
             Departments = new Repository<Department>(context);
-            Users = new Repository<User>(context);
+            Users = new Repository<ApplicationUser>(context);
             Roles = new Repository<Role>(context);
             Permissions = new Repository<Permission>(context);
         }

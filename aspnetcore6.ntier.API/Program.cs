@@ -105,8 +105,6 @@ using (var scope = app.Services.CreateScope())
 
 // Global exception handler (should be at the top)
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-// Authentication middleware (check if windows authenticated user exists in database)
-app.UseMiddleware<AuthenticateUserMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

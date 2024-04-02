@@ -2,9 +2,11 @@
 using aspnetcore6.ntier.DAL.Interfaces.Repositories;
 using aspnetcore6.ntier.DAL.Models.AccessControl;
 using aspnetcore6.ntier.DAL.Models.General;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace aspnetcore6.ntier.BLL.Utilities
 {
@@ -26,20 +28,19 @@ namespace aspnetcore6.ntier.BLL.Utilities
         {
             try
             {
-                #region Seed superuser
+                // Create mock HTTP context for seed
+                CreateSeedHttpContext();
+                
+                // Seed superuser
                 await SeedSuperuser();
-                #endregion
 
-                #region General entity
+                // General entites
                 await SeedDepartments();
-                #endregion
 
-                #region Access control entity
+                // Access control entites
                 await SeedPermissions();
                 await SeedRoles();
                 await SeedUsers();
-                #endregion
-
             }
             catch (Exception ex)
             {
@@ -84,10 +85,28 @@ namespace aspnetcore6.ntier.BLL.Utilities
         }
         #endregion
 
+        #region Create seed mock HTTP context
+        private void CreateSeedHttpContext()
+        {
+
+            // Configure and create mock IHttpContextAccessor required so that data could be seeded with mocked user
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, "SUPERUSER")
+            }, "SEED_MOCK_AUTH"));
+
+            // Create an instance of HttpContextAccessor and set its HttpContext property
+            var httpContextAccessor = new HttpContextAccessor();
+            httpContextAccessor.HttpContext = httpContext;
+        }
+        #endregion
+
         #region Seed superuser
         private async Task SeedSuperuser()
         {
-            IEnumerable<User> users = await _unitOfWork.Users.GetAll();
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.GetAll();
 
             // Seed only if none exists
             if (!users.Any())
@@ -120,6 +139,8 @@ namespace aspnetcore6.ntier.BLL.Utilities
         #endregion
 
         #region General entitiy seed methods (private)
+
+
         private async Task SeedDepartments()
         {
             IEnumerable<Department> departments = await _unitOfWork.Departments.GetAll();
@@ -255,13 +276,13 @@ namespace aspnetcore6.ntier.BLL.Utilities
 
         private async Task SeedUsers()
         {
-            IEnumerable<User> users = await _unitOfWork.Users.GetAll();
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.GetAll();
             // Seed users only if there is just one user (Superuser)
             if (users.Any() && users.Count() == 1)
             {
-                List<User> usersToSeed = new List<User>()
+                List<ApplicationUser> usersToSeed = new List<ApplicationUser>()
                 {
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "john_smith",
                         FirstName = "John",
@@ -269,7 +290,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "john.smith@example.com",
                         DepartmentId = 1
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "mary_jones",
                         FirstName = "Mary",
@@ -277,7 +298,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "mary.jones@example.com",
                         DepartmentId = 2
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "david_wilson",
                         FirstName = "David",
@@ -285,7 +306,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "david.wilson@example.com",
                         DepartmentId = 1
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "laura_davis",
                         FirstName = "Laura",
@@ -293,7 +314,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "laura.davis@example.com",
                         DepartmentId = 3
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "mark_thompson",
                         FirstName = "Mark",
@@ -301,7 +322,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "mark.thompson@example.com",
                         DepartmentId = 2
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "susan_miller",
                         FirstName = "Susan",
@@ -309,7 +330,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "susan.miller@example.com",
                         DepartmentId = 1
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "chris_roberts",
                         FirstName = "Chris",
@@ -317,7 +338,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "chris.roberts@example.com",
                         DepartmentId = 3
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "emily_walker",
                         FirstName = "Emily",
@@ -325,7 +346,7 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "emily.walker@example.com",
                         DepartmentId = 2
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "james_anderson",
                         FirstName = "James",
@@ -333,13 +354,21 @@ namespace aspnetcore6.ntier.BLL.Utilities
                         Email = "james.anderson@example.com",
                         DepartmentId = 1
                     },
-                    new User
+                    new ApplicationUser
                     {
                         UserName = "sarah_harris",
                         FirstName = "Sarah",
                         LastName = "Harris",
                         Email = "sarah.harris@example.com",
                         DepartmentId = 3
+                    },
+                    new ApplicationUser
+                    {
+                        UserName = "desktop-k9cdith\\vrbosic",
+                        FirstName = "Tomislav",
+                        LastName = "Vrbošić",
+                        Email = "tomislav.vrbosic@example.com",
+                        DepartmentId = 1
                     }
                 };
 

@@ -17,7 +17,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AuditKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Operation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EntityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
