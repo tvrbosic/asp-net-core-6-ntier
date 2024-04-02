@@ -225,10 +225,10 @@ public class ApiDbContext : DbContext
     private ApplicationUser GetAuthenticatedUser()
     {
         var  authenticatedUserName = _httpContextAccessor.HttpContext.User.Identity.Name;
-        // Retrieve user ID from HttpContext.Items
+        
         if (authenticatedUserName != null)
         {
-            // AsEnumberable is required because of previously configured query filter on Users table
+            // AsEnumberable is required because of previously configured query filter on Users table (in this file)
             IEnumerable<ApplicationUser> findUserResult = this.Users.AsEnumerable().Where(u => u.UserName.ToLower().Equals(authenticatedUserName.ToLower()));
 
             if (findUserResult.Any())
