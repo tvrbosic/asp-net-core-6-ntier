@@ -10,7 +10,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         private readonly ApiDbContext _context;
-        private readonly DbSet<TEntity> _dbSet;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public Repository(ApiDbContext context)
         {
@@ -19,23 +19,12 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
         }
 
         #region Public repository methods
-        // =======================================| IMPORTANT |======================================= //
-        /// <summary>
-        /// Exposes _dbSet so we could execute additional EF queries on it in case generic repository is already not providing desired functionality.
-        /// This approach removes possible situation in which we would create custom repository for specific case and attach it to UnitOfWork.
-        /// </summary>
-        /// <returns>Queryable DbSet of type TEntity.</returns>
-        public IQueryable<TEntity> Queryable()
-        {
-            return _dbSet;
-        }
-
-        public async Task<IEnumerable<TEntity>> GetAll()
+        public virtual async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public async Task<PaginatedData<TEntity>> GetAllPaginated(
+        public virtual async Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber,
             int PageSize,
             Expression<Func<TEntity, bool>>? searchTextPredicate,
@@ -56,7 +45,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             return await PaginateData(filteredEntities, PageNumber, PageSize);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsNoTracking().AsQueryable();
 
@@ -69,7 +58,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
 
         }
 
-        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
             IEnumerable<TEntity> result = await _dbSet.Where(predicate).ToListAsync();
             if (result == null)
@@ -80,7 +69,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsQueryable();
 
@@ -99,7 +88,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             return result;
         }
 
-        public async Task<TEntity?> GetById(int id)
+        public virtual async Task<TEntity> GetById(int id)
         {
             TEntity? result = await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
 
@@ -111,7 +100,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             return result;
         }
 
-        public async Task<TEntity?> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsQueryable();
 
@@ -130,12 +119,12 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             return result;
         }
 
-        public async Task Add(TEntity entity)
+        public virtual async Task Add(TEntity entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities)
+        public virtual async Task AddRange(IEnumerable<TEntity> entities)
         {
             await _dbSet.AddRangeAsync(entities);
         }

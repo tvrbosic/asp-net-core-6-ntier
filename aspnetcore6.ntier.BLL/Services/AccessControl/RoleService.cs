@@ -24,12 +24,7 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
         public async Task<IEnumerable<RoleDTO>> GetRoles()
         {
-            IEnumerable<Role> roles = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .ToListAsync();
+            IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }
@@ -60,17 +55,7 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
         public async Task<RoleDTO> GetRole(int id)
         {
-            Role? role = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (role == null)
-            {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(Role)} with id: {id}");
-            }
+            Role? role = await _unitOfWork.Roles.GetById(id);
 
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
@@ -98,17 +83,7 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
         public async Task<bool> UpdateRole(UpdateRoleDTO roleDTO)
         {
-            Role? updateRole = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .FirstOrDefaultAsync(r => r.Id == roleDTO.Id);
-
-            if (updateRole == null)
-            {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(Role)} with id: {roleDTO.Id}");
-            }
+            Role updateRole = await _unitOfWork.Roles.GetById(roleDTO.Id);
 
             _mapper.Map(roleDTO, updateRole);
 
@@ -117,16 +92,12 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                if (permissionToAdd != null)
+                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                updateRole.PermissionLinks.Add(new PermissionRoleLink
                 {
-                    updateRole.PermissionLinks.Add(new PermissionRoleLink
-                    {
-                        Role = updateRole,
-                        Permission = permissionToAdd
-                    });
-                }
-                
+                    Role = updateRole,
+                    Permission = permissionToAdd
+                });
             }
             await _unitOfWork.Roles.Update(updateRole);
             return await _unitOfWork.CompleteAsync() > 0;

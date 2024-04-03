@@ -1,4 +1,5 @@
 ﻿using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.DataAccess.Repositories.AccessControl;
 using aspnetcore6.ntier.Models.AccessControl;
 using aspnetcore6.ntier.Models.General;
 
@@ -14,7 +15,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
 
         #region Access control entity registration
         public IRepository<ApplicationUser> Users{ get; }
-        public IRepository<Role> Roles { get; }
+        public RoleRepository Roles { get; }
         public IRepository<Permission> Permissions { get; }
         #endregion
 
@@ -23,7 +24,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             _context = context;
             Departments = new Repository<Department>(context);
             Users = new Repository<ApplicationUser>(context);
-            Roles = new Repository<Role>(context);
+            Roles = new RoleRepository(context);
             Permissions = new Repository<Permission>(context);
         }
 
