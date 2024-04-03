@@ -105,6 +105,11 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
         public async Task<bool> DeleteRole(int id)
         {
+            Role deleteRole = await _unitOfWork.Roles.GetById(id);
+
+            deleteRole.PermissionLinks.Clear();
+            deleteRole.UserLinks.Clear();
+
             await _unitOfWork.Roles.Delete(id);
             return await _unitOfWork.CompleteAsync() > 0;
         }
