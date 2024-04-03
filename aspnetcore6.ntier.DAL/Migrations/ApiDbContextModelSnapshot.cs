@@ -21,6 +21,77 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("AuditKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSoftDeleteProtected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
                 {
                     b.Property<int>("Id")
@@ -239,77 +310,6 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.ToTable("RoleUserLinks");
                 });
 
-            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<Guid>("AuditKey")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateDeleted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(70)
-                        .HasColumnType("nvarchar(70)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSoftDeleteProtected")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.AuditLog", b =>
                 {
                     b.Property<int>("Id")
@@ -336,7 +336,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
+                    b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -395,13 +395,40 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.General.Department", "Department")
+                        .WithMany("Users")
+                        .HasForeignKey("DepartmentId");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
+                {
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById");
 
@@ -411,7 +438,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
@@ -426,11 +453,11 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.PermissionRoleLink", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById");
 
@@ -446,7 +473,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
@@ -463,11 +490,11 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Role", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById");
 
@@ -477,7 +504,7 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
@@ -492,11 +519,11 @@ namespace aspnetcore6.ntier.DAL.Migrations
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.RoleUserLink", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById");
 
@@ -506,11 +533,11 @@ namespace aspnetcore6.ntier.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "User")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "User")
                         .WithMany("RoleLinks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -527,52 +554,30 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.User", b =>
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById");
 
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.General.Department", "Department")
-                        .WithMany("Users")
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
+                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedBy");
-
-                    b.Navigation("Department");
 
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>
+            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.ApplicationUser", b =>
                 {
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById");
-
-                    b.HasOne("aspnetcore6.ntier.DAL.Models.AccessControl.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("DeletedBy");
-
-                    b.Navigation("UpdatedBy");
+                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.Permission", b =>
@@ -585,11 +590,6 @@ namespace aspnetcore6.ntier.DAL.Migrations
                     b.Navigation("PermissionLinks");
 
                     b.Navigation("UserLinks");
-                });
-
-            modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.AccessControl.User", b =>
-                {
-                    b.Navigation("RoleLinks");
                 });
 
             modelBuilder.Entity("aspnetcore6.ntier.DAL.Models.General.Department", b =>

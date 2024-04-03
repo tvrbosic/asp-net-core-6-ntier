@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace aspnetcore6.ntier.DAL.Models.AccessControl
 {
-    public class User : BaseEntity, ISoftDeleteProtectedEntity
+    public class ApplicationUser : BaseEntity, ISoftDeleteProtectedEntity
     {
         [Required]
         [MaxLength(50)]
