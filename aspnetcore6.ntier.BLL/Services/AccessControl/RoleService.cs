@@ -55,8 +55,7 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
         public async Task<RoleDTO> GetRole(int id)
         {
-            Role? role = await _unitOfWork.Roles.GetById(id);
-
+            Role role = await _unitOfWork.Roles.GetById(id);
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }
@@ -67,7 +66,7 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
                 if (permissionToAdd != null) { 
                     addRole.PermissionLinks.Add(new PermissionRoleLink
                     {

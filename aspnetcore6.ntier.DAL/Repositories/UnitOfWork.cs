@@ -14,18 +14,18 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
         #endregion
 
         #region Access control entity registration
-        public IRepository<ApplicationUser> Users{ get; }
-        public RoleRepository Roles { get; }
         public IRepository<Permission> Permissions { get; }
+        public RoleRepository Roles { get; }
+        public IRepository<ApplicationUser> Users{ get; }
         #endregion
 
         public UnitOfWork(ApiDbContext context)
         {
             _context = context;
             Departments = new Repository<Department>(context);
-            Users = new Repository<ApplicationUser>(context);
-            Roles = new RoleRepository(context);
             Permissions = new Repository<Permission>(context);
+            Roles = new RoleRepository(context);
+            Users = new UserRepository(context);
         }
 
         public async Task<int> CompleteAsync()
