@@ -1,12 +1,11 @@
 ﻿#nullable disable
 using Microsoft.EntityFrameworkCore;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Models.Abstract;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.General;
+using aspnetcore6.ntier.Models.Abstract;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
-using aspnetcore6.ntier.DAL.Interfaces.Abstract;
 using Microsoft.AspNetCore.Http;
 
 public class ApiDbContext : DbContext
@@ -153,32 +152,7 @@ public class ApiDbContext : DbContext
                     entry.Property("DateDeleted").CurrentValue = DateTime.UtcNow;
                     entry.Property("IsDeleted").CurrentValue = true;
                     entry.State = EntityState.Modified;
-                    // Cascade soft delete navigation properties
-                    ProcessCascadeSoftDelete(entry, authenticatedUser);
                     break;
-            }
-        }
-    }
-
-    private void ProcessCascadeSoftDelete(EntityEntry entry, ApplicationUser authenticatedUser)
-    {
-        foreach (var navigationEntry in entry.Navigations)
-        {
-            if (navigationEntry is CollectionEntry collectionEntry)
-            {
-                if(!navigationEntry.IsLoaded) navigationEntry.Load();
-                foreach (var dependentEntry in collectionEntry.CurrentValue)
-                {
-                    SoftDeleteIfNotProtected(dependentEntry, authenticatedUser);
-                }
-            }
-            else
-            {
-                var dependentEntry = navigationEntry.CurrentValue;
-                if (dependentEntry != null)
-                {
-                    SoftDeleteIfNotProtected(dependentEntry, authenticatedUser);
-                }
             }
         }
     }
@@ -210,17 +184,6 @@ public class ApiDbContext : DbContext
         AuditLogs.AddRange(auditLogEntries);
     }
 
-    private void SoftDeleteIfNotProtected(object entity, ApplicationUser authenticatedUser)
-    {
-        var isSoftDeleteProtected = entity is ISoftDeleteProtectedEntity protectedEntity && protectedEntity.IsSoftDeleteProtected;
-        if (!isSoftDeleteProtected)
-        {
-            Entry(entity).Property("DeletedById").CurrentValue = authenticatedUser.Id;
-            Entry(entity).Property("DateDeleted").CurrentValue = DateTime.UtcNow;
-            Entry(entity).Property("IsDeleted").CurrentValue = true;
-            Entry(entity).State = EntityState.Modified;
-        }
-    }
 
     private ApplicationUser GetAuthenticatedUser()
     {

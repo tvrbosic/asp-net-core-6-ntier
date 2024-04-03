@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace aspnetcore6.ntier.DAL.Migrations
+namespace aspnetcore6.ntier.DataAccess.Migrations
 {
     public partial class InitialMigration : Migration
     {

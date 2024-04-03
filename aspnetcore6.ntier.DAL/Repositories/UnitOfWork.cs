@@ -1,8 +1,8 @@
-﻿using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.General;
+﻿using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.General;
 
-namespace aspnetcore6.ntier.DAL.Repositories
+namespace aspnetcore6.ntier.DataAccess.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {

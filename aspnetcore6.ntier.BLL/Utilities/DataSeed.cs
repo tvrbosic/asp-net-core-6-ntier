@@ -1,14 +1,14 @@
-﻿using aspnetcore6.ntier.BLL.Interfaces.Utilities;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.General;
+﻿using aspnetcore6.ntier.Services.Interfaces.Utilities;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.General;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
-namespace aspnetcore6.ntier.BLL.Utilities
+namespace aspnetcore6.ntier.Services.Utilities
 {
     public class DataSeed : IDataSeed
     {

@@ -1,7 +1,7 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.General;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.General;
+using aspnetcore6.ntier.Services.DTO.Shared;
 
-namespace aspnetcore6.ntier.BLL.Interfaces.General
+namespace aspnetcore6.ntier.Services.Interfaces.General
 {
     public interface IDepartmentService
     {

@@ -1,8 +1,8 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.BLL.DTOs.General;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.General;
+using aspnetcore6.ntier.Services.DTO.General;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.General;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.General

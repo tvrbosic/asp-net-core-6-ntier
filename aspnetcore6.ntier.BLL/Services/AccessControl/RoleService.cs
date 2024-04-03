@@ -1,15 +1,15 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
-using aspnetcore6.ntier.DAL.Exceptions;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
+using aspnetcore6.ntier.DataAccess.Exceptions;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl
+namespace aspnetcore6.ntier.Services.Services.AccessControl
 {
     public class RoleService : IRoleService
     {

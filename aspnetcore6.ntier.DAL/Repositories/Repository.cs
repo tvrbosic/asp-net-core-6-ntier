@@ -1,12 +1,11 @@
-﻿using aspnetcore6.ntier.DAL.Exceptions;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.Abstract;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.DataAccess.Exceptions;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.Abstract;
+using aspnetcore6.ntier.Models.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.DAL.Repositories
+namespace aspnetcore6.ntier.DataAccess.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
@@ -54,7 +53,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
             // Paginate
-            return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
+            return await PaginateData(filteredEntities, PageNumber, PageSize);
         }
 
         public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
@@ -172,7 +171,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Private repository methods
-        public IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
+        private IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
         {
             // Check if the orderByProperty exists in the TEntity type
             var entityType = typeof(TEntity);
@@ -193,6 +192,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
             // Return ordered 
             return ascending ? entities.OrderBy(lambda) : entities.OrderByDescending(lambda);
+        }
+
+        private async Task<PaginatedData<TEntity>> PaginateData(IQueryable<TEntity> source, int pageNumber, int pageSize)
+        {
+            var count = await source.CountAsync();
+            var entities = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedData<TEntity>(entities, count, pageNumber, pageSize);
         }
         #endregion
     }

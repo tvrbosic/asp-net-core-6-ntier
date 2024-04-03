@@ -1,4 +1,4 @@
-﻿namespace aspnetcore6.ntier.DAL.Exceptions
+﻿namespace aspnetcore6.ntier.DataAccess.Exceptions
 {
     public class EntityNotFoundException : Exception
     {

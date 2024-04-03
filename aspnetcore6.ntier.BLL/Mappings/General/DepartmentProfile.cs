@@ -1,10 +1,10 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.General;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.General;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Models.General;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
 
-namespace aspnetcore6.ntier.BLL.Mappings.General
+namespace aspnetcore6.ntier.Services.Mappings.General
 {
     public class DepartmentProfile : Profile
     {
