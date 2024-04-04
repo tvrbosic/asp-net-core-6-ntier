@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using aspnetcore6.ntier.Services.Constants;
 
 namespace aspnetcore6.ntier.Services.Utilities
 {
@@ -240,13 +241,14 @@ namespace aspnetcore6.ntier.Services.Utilities
                 Random random = new Random();
 
                 string[] roleNames = {
-                    "Super Administrator",
-                    "Administrator",
-                    "User",
-                    "Guest",
-                    "Administrator",
-                    "User",
-                    "Guest",
+                    UserRoleConstants.SuperAdministrator,
+                    UserRoleConstants.Administrator,
+                    UserRoleConstants.FirstDepartmentAdministrator,
+                    UserRoleConstants.FirstDepartmentUser,
+                    UserRoleConstants.FirstDepartmentGuest,
+                    UserRoleConstants.SecondDepartmentAdministrator,
+                    UserRoleConstants.SecondDepartmentUser,
+                    UserRoleConstants.SecondDepartmentGuest,
                 };
 
                 foreach (string roleName in roleNames)

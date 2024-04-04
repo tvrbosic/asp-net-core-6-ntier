@@ -17,6 +17,8 @@ namespace aspnetcore6.ntier.Services.Interfaces.AccessControl
 
         Task<UserDTO> GetUser(int id);
 
+        Task<UserDTO> GetUserByUsername(string username);
+
         Task<bool> AddUser(AddUserDTO role);
 
         Task<bool> UpdateUser(UpdateUserDTO role);

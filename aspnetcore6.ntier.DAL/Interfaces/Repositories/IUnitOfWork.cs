@@ -7,9 +7,9 @@ namespace aspnetcore6.ntier.DataAccess.Interfaces.Repositories
     public interface IUnitOfWork : IDisposable
     {
         IRepository<Department> Departments { get; }
-        IRepository<ApplicationUser> Users { get; }
-        RoleRepository Roles { get; }
         IRepository<Permission> Permissions { get; }
+        RoleRepository Roles { get; }
+        UserRepository Users { get; }
 
         Task<int> CompleteAsync();
     }

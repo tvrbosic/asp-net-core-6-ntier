@@ -16,7 +16,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
         #region Access control entity registration
         public IRepository<Permission> Permissions { get; }
         public RoleRepository Roles { get; }
-        public IRepository<ApplicationUser> Users{ get; }
+        public UserRepository Users { get; }
         #endregion
 
         public UnitOfWork(ApiDbContext context)
