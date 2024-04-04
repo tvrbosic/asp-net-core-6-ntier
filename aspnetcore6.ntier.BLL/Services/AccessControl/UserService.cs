@@ -1,12 +1,10 @@
 ﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
 using aspnetcore6.ntier.Services.DTO.Shared;
 using aspnetcore6.ntier.Services.Interfaces.AccessControl;
-using aspnetcore6.ntier.DataAccess.Exceptions;
 using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
 using aspnetcore6.ntier.Models.AccessControl;
 using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace aspnetcore6.ntier.Services.Services.AccessControl

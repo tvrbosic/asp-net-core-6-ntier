@@ -1,6 +1,7 @@
 ﻿using aspnetcore6.ntier.DataAccess.Exceptions;
 using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
 using aspnetcore6.ntier.Models.Abstract;
+using aspnetcore6.ntier.Models.AccessControl;
 using aspnetcore6.ntier.Models.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -36,6 +37,12 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             if (searchTextPredicate != null)
             {
                 filteredEntities = _dbSet.Where(searchTextPredicate).AsQueryable();
+            }
+
+            // Check if TEntity is ApplicationUser and filter out user with ID 1 (SUPERUSER)
+            if (typeof(TEntity) == typeof(ApplicationUser))
+            {
+                filteredEntities = filteredEntities.Where(u => u.Id != 1);
             }
 
             // Order

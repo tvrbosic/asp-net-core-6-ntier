@@ -1,6 +1,7 @@
 ﻿using aspnetcore6.ntier.DataAccess.Exceptions;
 using aspnetcore6.ntier.Models.AccessControl;
 using Microsoft.EntityFrameworkCore;
+using System.Security;
 
 namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 {
@@ -17,6 +18,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
                 .ThenInclude(pl => pl.Role)
+                .Where(u => u.Id != 1) // Filter out SUPERUSER
                 .ToListAsync();
 
             if (roles == null)
@@ -29,6 +31,11 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 
         public override async Task<ApplicationUser> GetById(int id)
         {
+            if (id == 1)
+            {
+                throw new SecurityException("Access to user with ID 1 is forbidden!");
+            }
+
             ApplicationUser? role = await _dbSet
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
@@ -41,6 +48,26 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
             }
 
             return role;
+        }
+
+        public override async Task Update(ApplicationUser entity)
+        {
+            if (entity.Id == 1)
+            {
+                throw new SecurityException("Update of user with ID 1 is forbidden!");
+            }
+
+            await base.Update(entity);
+        }
+
+        public override async Task Delete(int id)
+        {
+            if (id == 1)
+            {
+                throw new SecurityException("Deletion of user with ID 1 is forbidden!");
+            }
+
+            await base.Delete(id);
         }
     }
 }
