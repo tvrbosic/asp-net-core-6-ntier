@@ -1,15 +1,15 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
-using aspnetcore6.ntier.DAL.Exceptions;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
+using aspnetcore6.ntier.DataAccess.Exceptions;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl
+namespace aspnetcore6.ntier.Services.Services.AccessControl
 {
     public class RoleService : IRoleService
     {
@@ -24,12 +24,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<IEnumerable<RoleDTO>> GetRoles()
         {
-            IEnumerable<Role> roles = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .ToListAsync();
+            IEnumerable<Role> roles = await _unitOfWork.Roles.GetAll();
             IEnumerable<RoleDTO> roleDTOs = _mapper.Map<IEnumerable<RoleDTO>>(roles);
             return roleDTOs;
         }
@@ -60,18 +55,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<RoleDTO> GetRole(int id)
         {
-            Role? role = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (role == null)
-            {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(Role)} with id: {id}");
-            }
-
+            Role role = await _unitOfWork.Roles.GetById(id);
             RoleDTO roleDTO = _mapper.Map<RoleDTO>(role);
             return roleDTO;
         }
@@ -82,7 +66,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
                 if (permissionToAdd != null) { 
                     addRole.PermissionLinks.Add(new PermissionRoleLink
                     {
@@ -98,17 +82,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> UpdateRole(UpdateRoleDTO roleDTO)
         {
-            Role? updateRole = await _unitOfWork.Roles
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.PermissionLinks)
-                .ThenInclude(pl => pl.Permission)
-                .FirstOrDefaultAsync(r => r.Id == roleDTO.Id);
-
-            if (updateRole == null)
-            {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(Role)} with id: {roleDTO.Id}");
-            }
+            Role updateRole = await _unitOfWork.Roles.GetById(roleDTO.Id);
 
             _mapper.Map(roleDTO, updateRole);
 
@@ -117,16 +91,12 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             foreach (int permissionId in roleDTO.PermissionIds)
             {
-                Permission? permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
-                if (permissionToAdd != null)
+                Permission permissionToAdd = await _unitOfWork.Permissions.GetById(permissionId);
+                updateRole.PermissionLinks.Add(new PermissionRoleLink
                 {
-                    updateRole.PermissionLinks.Add(new PermissionRoleLink
-                    {
-                        Role = updateRole,
-                        Permission = permissionToAdd
-                    });
-                }
-                
+                    Role = updateRole,
+                    Permission = permissionToAdd
+                });
             }
             await _unitOfWork.Roles.Update(updateRole);
             return await _unitOfWork.CompleteAsync() > 0;
@@ -134,6 +104,11 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> DeleteRole(int id)
         {
+            Role deleteRole = await _unitOfWork.Roles.GetById(id);
+
+            deleteRole.PermissionLinks.Clear();
+            deleteRole.UserLinks.Clear();
+
             await _unitOfWork.Roles.Delete(id);
             return await _unitOfWork.CompleteAsync() > 0;
         }

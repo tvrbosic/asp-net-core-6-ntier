@@ -1,8 +1,8 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.AccessControl
@@ -19,7 +19,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
+        public async Task<ActionResult<ApiDataResponse<IEnumerable<UserDTO>>>> GetUsers()
         {
             IEnumerable<UserDTO> users = await _userService.GetUsers();
             var response = new ApiDataResponse<IEnumerable<UserDTO>>(users, "Users retrieved succcessfully.");
@@ -27,7 +27,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetPaginatedUsers([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<ApiPagnatedResponse<UserDTO>>> GetPaginatedUsers([FromQuery] PaginateQueryParameters qp)
         {
             PaginatedDataDTO<UserDTO> pu = await _userService.GetPaginatedUsers(
                 qp.PageNumber,
@@ -50,7 +50,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(int id)
+        public async Task<ActionResult<ApiDataResponse<UserDTO>>> GetUser(int id)
         {
             UserDTO user = await _userService.GetUser(id);
             var response = new ApiDataResponse<UserDTO>(user, "User retrieved succcessfully.");
@@ -58,7 +58,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostUser(AddUserDTO userDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PostUser(AddUserDTO userDTO)
         {
             await _userService.AddUser(userDTO);
             var response = new ApiBaseResponse("User created succcessfully.");
@@ -66,7 +66,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutUser(UpdateUserDTO userDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PutUser(UpdateUserDTO userDTO)
         {
             await _userService.UpdateUser(userDTO);
             var response = new ApiBaseResponse("User updated succcessfully.");
@@ -74,7 +74,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<ActionResult<ApiBaseResponse>> DeleteUser(int id)
         {
             await _userService.DeleteUser(id);
             var response = new ApiBaseResponse("User deleted succcessfully.");

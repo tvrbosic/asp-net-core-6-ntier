@@ -1,15 +1,13 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
-using aspnetcore6.ntier.DAL.Exceptions;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.BLL.Services.AccessControl
+namespace aspnetcore6.ntier.Services.Services.AccessControl
 {
     public class UserService : IUserService
     {
@@ -24,12 +22,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            IEnumerable<ApplicationUser> users = await _unitOfWork.Users
-                .Queryable()
-                .Include(u => u.Department)
-                .Include(u => u.RoleLinks)
-                .ThenInclude(pl => pl.Role)
-                .ToListAsync();
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.GetAll();
             IEnumerable<UserDTO> userDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
             return userDTOs;
         }
@@ -64,38 +57,9 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<UserDTO> GetUser(int id)
         {
-            ApplicationUser? user = await _unitOfWork.Users
-                .Queryable()
-                .Include(u => u.Department)
-                .Include(u => u.RoleLinks)
-                .ThenInclude(pl => pl.Role)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
-            {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(ApplicationUser)} with id: {id}");
-            }
-            else
-            {
-                UserDTO userDTO = _mapper.Map<UserDTO>(user);
-                return userDTO;
-            }
-        }
-
-        public async Task<UserDTO> GetUserByUsername(string userName)
-        {
-            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.Find(u => u.UserName.Equals(userName));
-            var user = users.FirstOrDefault();
-
-            if (user == null)
-            {
-                throw new EntityNotFoundException($"Get operation failed for entitiy {typeof(ApplicationUser)} with username: {userName}");
-            }
-            else
-            {
-                UserDTO userDTO = _mapper.Map<UserDTO>(user);
-                return userDTO;
-            }
+            ApplicationUser user = await _unitOfWork.Users.GetById(id);           
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
+            return userDTO;
         }
 
         public async Task<bool> AddUser(AddUserDTO userDTO)
@@ -105,7 +69,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
             // Add roles to user from provided roleIds
             foreach (int roleId in userDTO.RoleIds)
             {
-                Role? roleToAdd = await _unitOfWork.Roles.GetById(roleId);
+                Role roleToAdd = await _unitOfWork.Roles.GetById(roleId);
                 if (roleToAdd != null)
                 {
                     addUser.RoleLinks.Add(new RoleUserLink
@@ -122,17 +86,7 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> UpdateUser(UpdateUserDTO userDTO)
         {
-            ApplicationUser? updateUser = await _unitOfWork.Users
-                .Queryable()
-                .Include(r => r.Department)
-                .Include(r => r.RoleLinks)
-                .ThenInclude(rl => rl.Role)
-                .FirstOrDefaultAsync(r => r.Id == userDTO.Id);
-
-            if (updateUser == null)
-            {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(ApplicationUser)} with id: {userDTO.Id}");
-            }
+            ApplicationUser updateUser = await _unitOfWork.Users.GetById(userDTO.Id);
 
             _mapper.Map(userDTO, updateUser);
 
@@ -141,16 +95,12 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
             foreach (int roleId in userDTO.RoleIds)
             {
-                Role? roleToAdd = await _unitOfWork.Roles.GetById(roleId);
-                if (roleToAdd != null)
+                Role roleToAdd = await _unitOfWork.Roles.GetById(roleId);
+                updateUser.RoleLinks.Add(new RoleUserLink
                 {
-                    updateUser.RoleLinks.Add(new RoleUserLink
-                    {
-                        User = updateUser,
-                        Role = roleToAdd
-                    });
-                }
-                
+                    User = updateUser,
+                    Role = roleToAdd
+                });
             }
             await _unitOfWork.Users.Update(updateUser);
             return await _unitOfWork.CompleteAsync() > 0;
@@ -158,6 +108,10 @@ namespace aspnetcore6.ntier.BLL.Services.AccessControl
 
         public async Task<bool> DeleteUser(int id)
         {
+            ApplicationUser updateUser = await _unitOfWork.Users.GetById(id);
+            
+            updateUser.RoleLinks.Clear();
+            
             await _unitOfWork.Users.Delete(id);
             return await _unitOfWork.CompleteAsync() > 0;
         }

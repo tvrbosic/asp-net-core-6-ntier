@@ -1,8 +1,8 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Models.AccessControl;
 
-namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
+namespace aspnetcore6.ntier.Services.Interfaces.AccessControl
 {
     public interface IUserService
     {
@@ -16,8 +16,6 @@ namespace aspnetcore6.ntier.BLL.Interfaces.AccessControl
             bool ascending = true);
 
         Task<UserDTO> GetUser(int id);
-
-        Task<UserDTO> GetUserByUsername(string userName);
 
         Task<bool> AddUser(AddUserDTO role);
 

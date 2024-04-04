@@ -1,8 +1,8 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
+using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.AccessControl
@@ -19,7 +19,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetRoles()
+        public async Task<ActionResult<ApiDataResponse<IEnumerable<RoleDTO>>>> GetRoles()
         {
             IEnumerable<RoleDTO> roles = await _roleService.GetRoles();
             var response = new ApiDataResponse<IEnumerable<RoleDTO>>(roles, "Roles retrieved succcessfully.");
@@ -27,7 +27,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<ApiPagnatedResponse<RoleDTO>>> GetPaginatedRoles([FromQuery] PaginateQueryParameters qp)
         {
             PaginatedDataDTO<RoleDTO> pr = await _roleService.GetPaginatedRoles(
                 qp.PageNumber,
@@ -50,7 +50,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoleDTO>> GetRole(int id)
+        public async Task<ActionResult<ApiDataResponse<RoleDTO>>> GetRole(int id)
         {
             RoleDTO role = await _roleService.GetRole(id);
             var response = new ApiDataResponse<RoleDTO>(role, "Role retrieved succcessfully.");
@@ -58,7 +58,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostRole(AddRoleDTO roleDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PostRole(AddRoleDTO roleDTO)
         {
             await _roleService.AddRole(roleDTO);
             var response = new ApiBaseResponse("Role created succcessfully.");
@@ -66,7 +66,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutRole(UpdateRoleDTO roleDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PutRole(UpdateRoleDTO roleDTO)
         {
             await _roleService.UpdateRole(roleDTO);
             var response = new ApiBaseResponse("Role updated succcessfully.");
@@ -74,7 +74,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteRole(int id)
+        public async Task<ActionResult<ApiBaseResponse>> DeleteRole(int id)
         {
             await _roleService.DeleteRole(id);
             var response = new ApiBaseResponse("Role deleted succcessfully.");

@@ -1,8 +1,8 @@
 ﻿using aspnetcore6.ntier.API.Requests;
 using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.BLL.DTOs.General;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.General;
+using aspnetcore6.ntier.Services.DTO.General;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.General;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aspnetcore6.ntier.API.Controllers.General
@@ -19,7 +19,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
+        public async Task<ActionResult<ApiDataResponse<IEnumerable<DepartmentDTO>>>> GetDepartments()
         {
             IEnumerable<DepartmentDTO> departments = await _departmentService.GetDepartments();
             var response = new ApiDataResponse<IEnumerable<DepartmentDTO>>(departments, "Departments retrieved succcessfully.");
@@ -27,7 +27,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<ApiPagnatedResponse<DepartmentDTO>>> GetPaginatedDepartments([FromQuery] PaginateQueryParameters qp)
         {
             PaginatedDataDTO<DepartmentDTO> pd = await _departmentService.GetPaginatedDepartments(
                 qp.PageNumber,
@@ -50,7 +50,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<DepartmentDTO>> GetDepartment(int id)
+        public async Task<ActionResult<ApiDataResponse<DepartmentDTO>>> GetDepartment(int id)
         {
             DepartmentDTO? department = await _departmentService.GetDepartment(id);
             var response = new ApiDataResponse<DepartmentDTO>(department, "Department retrieved succcessfully.");
@@ -58,7 +58,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostDepartment(AddDepartmentDTO departmentDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PostDepartment(AddDepartmentDTO departmentDTO)
         {
             await _departmentService.AddDepartment(departmentDTO);
             var response = new ApiBaseResponse("Department creaeted succcessfully.");
@@ -66,7 +66,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutDepartment(UpdateDepartmentDTO departmentDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PutDepartment(UpdateDepartmentDTO departmentDTO)
         {
             await _departmentService.UpdateDepartment(departmentDTO);
             var response = new ApiBaseResponse("Department updated succcessfully.");
@@ -74,7 +74,7 @@ namespace aspnetcore6.ntier.API.Controllers.General
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteDepartment(int id)
+        public async Task<ActionResult<ApiBaseResponse>> DeleteDepartment(int id)
         {
             await _departmentService.DeleteDepartment(id);
             var response = new ApiBaseResponse("Department deleted succcessfully.");

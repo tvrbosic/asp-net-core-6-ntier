@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using aspnetcore6.ntier.API.Middleware;
-using aspnetcore6.ntier.BLL.Interfaces.AccessControl;
-using aspnetcore6.ntier.BLL.Interfaces.General;
-using aspnetcore6.ntier.BLL.Interfaces.Utilities;
-using aspnetcore6.ntier.BLL.Services.General;
-using aspnetcore6.ntier.BLL.Utilities;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Repositories;
+using aspnetcore6.ntier.Services.Interfaces.AccessControl;
+using aspnetcore6.ntier.Services.Interfaces.General;
+using aspnetcore6.ntier.Services.Interfaces.Utilities;
+using aspnetcore6.ntier.Services.Services.General;
+using aspnetcore6.ntier.Services.Utilities;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using aspnetcore6.ntier.BLL.Services.AccessControl;
+using aspnetcore6.ntier.Services.Services.AccessControl;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Any;
@@ -80,35 +80,11 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // =======================================| UTILITY |======================================= //
-builder.Services.AddScoped<IDataSeed, DataSeed>();
+builder.Services.AddScoped<IDataSeedService, DataSeedService>();
 #endregion
 
 
 var app = builder.Build();
-
-#region Seed data based on environment
-using (var scope = app.Services.CreateScope())
-{
-    var dataSeed = scope.ServiceProvider.GetRequiredService<IDataSeed>();
-
-    if (app.Environment.IsDevelopment())
-    {
-        await dataSeed.DevelopmentDataSeed();
-    }
-    else if (app.Environment.IsEnvironment("Test"))
-    {
-        await dataSeed.TestDataSeed();
-    }
-    else if (app.Environment.IsEnvironment("Uat"))
-    {
-        await dataSeed.UatDataSeed();
-    }
-    else if (app.Environment.IsProduction())
-    {
-        await dataSeed.ProductionDataSeed();
-    }
-}
-#endregion
 
 #region Configure the HTTP request pipeline
 // REMINDER: Keep in mind that middleware invoking order is important!

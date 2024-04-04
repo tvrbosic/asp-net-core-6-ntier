@@ -1,5 +1,5 @@
 ﻿using aspnetcore6.ntier.API.Responses;
-using aspnetcore6.ntier.DAL.Exceptions;
+using aspnetcore6.ntier.DataAccess.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Security;

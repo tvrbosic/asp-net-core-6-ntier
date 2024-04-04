@@ -1,10 +1,10 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
 
-namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
+namespace aspnetcore6.ntier.Services.Mappings.AccessControl
 {
     public class AccessControlProfile : Profile
     {

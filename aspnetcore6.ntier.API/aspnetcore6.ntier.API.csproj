@@ -30,8 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspnetcore6.ntier.BLL\aspnetcore6.ntier.BLL.csproj" />
-    <ProjectReference Include="..\aspnetcore6.ntier.DAL\aspnetcore6.ntier.DAL.csproj" />
+    <ProjectReference Include="..\aspnetcore6.ntier.BLL\aspnetcore6.ntier.Services.csproj" />
   </ItemGroup>
 
 </Project>
