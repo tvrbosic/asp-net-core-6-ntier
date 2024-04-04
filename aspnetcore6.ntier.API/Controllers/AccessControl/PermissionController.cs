@@ -19,7 +19,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPermissions()
+        public async Task<ActionResult<ApiDataResponse<IEnumerable<PermissionDTO>>>> GetPermissions()
         {
             IEnumerable<PermissionDTO> permissions = await _permissionService.GetPermissions();
             var response = new ApiDataResponse<IEnumerable<PermissionDTO>>(permissions, "Permissions retrieved succcessfully.");
@@ -28,7 +28,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
 
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<PermissionDTO>>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters qp)
+        public async Task<ActionResult<ApiPagnatedResponse<PermissionDTO>>> GetPaginatedPermissions([FromQuery] PaginateQueryParameters qp)
         {
             PaginatedDataDTO<PermissionDTO> pp = await _permissionService.GetPaginatedPermissions(
                 qp.PageNumber,
@@ -51,14 +51,14 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PermissionDTO>> GetPermission(int id)
+        public async Task<ActionResult<ApiDataResponse<PermissionDTO>>> GetPermission(int id)
         {
             PermissionDTO permission = await _permissionService.GetPermission(id);
             var response = new ApiDataResponse<PermissionDTO>(permission, "Permission retrieved succcessfully.");
             return Ok(response);
         }
         [HttpPost]
-        public async Task<IActionResult> PostPermission(AddPermissionDTO permissionDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PostPermission(AddPermissionDTO permissionDTO)
         {
             await _permissionService.AddPermission(permissionDTO);
             var response = new ApiBaseResponse("Permission created succcessfully.");
@@ -66,7 +66,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutPermission(UpdatePermissionDTO permissionDTO)
+        public async Task<ActionResult<ApiBaseResponse>> PutPermission(UpdatePermissionDTO permissionDTO)
         {
             await _permissionService.UpdatePermission(permissionDTO);
             var response = new ApiBaseResponse("Permission updated succcessfully.");
@@ -74,7 +74,7 @@ namespace aspnetcore6.ntier.API.Controllers.AccessControl
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeletePermission(int id)
+        public async Task<ActionResult<ApiBaseResponse>> DeletePermission(int id)
         {
             await _permissionService.DeletePermission(id);
             var response = new ApiBaseResponse("Permission deleted succcessfully.");

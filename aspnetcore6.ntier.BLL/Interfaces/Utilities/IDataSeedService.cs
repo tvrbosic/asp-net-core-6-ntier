@@ -1,6 +1,6 @@
 ﻿namespace aspnetcore6.ntier.Services.Interfaces.Utilities
 {
-    public interface IDataSeed
+    public interface IDataSeedService
     {
         public Task DevelopmentDataSeed();
         public Task TestDataSeed();

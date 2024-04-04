@@ -80,35 +80,11 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // =======================================| UTILITY |======================================= //
-builder.Services.AddScoped<IDataSeed, DataSeed>();
+builder.Services.AddScoped<IDataSeedService, DataSeedService>();
 #endregion
 
 
 var app = builder.Build();
-
-#region Seed data based on environment
-using (var scope = app.Services.CreateScope())
-{
-    var dataSeed = scope.ServiceProvider.GetRequiredService<IDataSeed>();
-
-    if (app.Environment.IsDevelopment())
-    {
-        await dataSeed.DevelopmentDataSeed();
-    }
-    else if (app.Environment.IsEnvironment("Test"))
-    {
-        await dataSeed.TestDataSeed();
-    }
-    else if (app.Environment.IsEnvironment("Uat"))
-    {
-        await dataSeed.UatDataSeed();
-    }
-    else if (app.Environment.IsProduction())
-    {
-        await dataSeed.ProductionDataSeed();
-    }
-}
-#endregion
 
 #region Configure the HTTP request pipeline
 // REMINDER: Keep in mind that middleware invoking order is important!

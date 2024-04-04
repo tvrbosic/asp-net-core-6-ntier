@@ -10,13 +10,13 @@ using System.Security.Claims;
 
 namespace aspnetcore6.ntier.Services.Utilities
 {
-    public class DataSeed : IDataSeed
+    public class DataSeedService : IDataSeedService
     {
-        private readonly ILogger<DataSeed> _logger;
+        private readonly ILogger<DataSeedService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApiDbContext _context;
 
-        public DataSeed(ILogger<DataSeed> logger, IUnitOfWork unitOfWOrk, ApiDbContext context)
+        public DataSeedService(ILogger<DataSeedService> logger, IUnitOfWork unitOfWOrk, ApiDbContext context)
         {
             _logger = logger;
             _unitOfWork = unitOfWOrk;
