@@ -115,8 +115,8 @@ namespace aspnetcore6.ntier.Services.Utilities
             { 
                 try
                 {
-                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted, IsSoftDeleteProtected, AuditKey) 
-                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted, @IsSoftDeleteProtected, @AuditKey)",
+                    _context.Database.ExecuteSqlRaw(@"INSERT INTO Users (UserName, FirstName, LastName, Email, DateCreated, IsDeleted, AuditKey) 
+                                                        VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted, @AuditKey)",
                         new[]
                         {
                             new SqlParameter("@UserName", "SUPERUSER"),
@@ -125,7 +125,6 @@ namespace aspnetcore6.ntier.Services.Utilities
                             new SqlParameter("@Email", "super.user@email.com"),
                             new SqlParameter("@DateCreated", DateTime.UtcNow),
                             new SqlParameter("@IsDeleted", false),
-                            new SqlParameter("@IsSoftDeleteProtected", true),
                             new SqlParameter("@AuditKey", Guid.NewGuid())
 
                 });
@@ -371,7 +370,15 @@ namespace aspnetcore6.ntier.Services.Utilities
                         LastName = "Vrbošić",
                         Email = "tomislav.vrbosic@example.com",
                         DepartmentId = 1
-                    }
+                    },
+                    new ApplicationUser
+                    {
+                        UserName = "koncar-institut\\tvrbosic",
+                        FirstName = "Tomislav",
+                        LastName = "Vrbošić",
+                        Email = "tomislav.vrbosic@example.com",
+                        DepartmentId = 1
+                    }                   
                 };
 
                 foreach (var userToSeed in usersToSeed)

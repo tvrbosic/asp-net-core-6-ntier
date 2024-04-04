@@ -135,12 +135,25 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
 
             if (existingEntity != null)
             {
-                _dbSet.Attach(entity);
-                _context.Entry(entity).State = EntityState.Modified;
+                // Check if the entity is already being tracked
+                var entry = _context.Entry(existingEntity);
+                if (entry.State == EntityState.Detached)
+                {
+                    // If it's detached, attach the provided entity
+                    _dbSet.Attach(entity);
+                }
+                else
+                {
+                    // If it's already being tracked, update its properties with the provided entity
+                    entry.CurrentValues.SetValues(entity);
+                }
+
+                // Set the state of the entity to Modified
+                entry.State = EntityState.Modified;
             }
             else
             {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(TEntity)} with id: {entity.Id}");
+                throw new EntityNotFoundException($"Update operation failed for entity {typeof(TEntity)} with id: {entity.Id}");
             }
         }
 

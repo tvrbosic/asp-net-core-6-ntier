@@ -63,9 +63,6 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsSoftDeleteProtected")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -122,9 +119,6 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -231,9 +225,6 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -371,9 +362,6 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSoftDeleteProtected")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
