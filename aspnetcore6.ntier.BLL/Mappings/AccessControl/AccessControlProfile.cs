@@ -1,10 +1,10 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.AccessControl;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.AccessControl;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
 
-namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
+namespace aspnetcore6.ntier.Services.Mappings.AccessControl
 {
     public class AccessControlProfile : Profile
     {
@@ -26,12 +26,12 @@ namespace aspnetcore6.ntier.BLL.Mappings.AccessControl
             CreateMap<UpdateRoleDTO, Role>();
 
             // User
-            CreateMap<User, User>();
-            CreateMap<User, UserDTO>()
+            CreateMap<ApplicationUser, ApplicationUser>();
+            CreateMap<ApplicationUser, UserDTO>()
                 .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleLinks.Select(rl => rl.Role)));
-            CreateMap<PaginatedData<User>, PaginatedDataDTO<UserDTO>>();
-            CreateMap<AddUserDTO, User>();
-            CreateMap<UpdateUserDTO, User>();
+            CreateMap<PaginatedData<ApplicationUser>, PaginatedDataDTO<UserDTO>>();
+            CreateMap<AddUserDTO, ApplicationUser>();
+            CreateMap<UpdateUserDTO, ApplicationUser>();
 
         }
     }

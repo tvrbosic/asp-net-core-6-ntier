@@ -1,13 +1,14 @@
-﻿using aspnetcore6.ntier.BLL.DTOs.General;
-using aspnetcore6.ntier.BLL.DTOs.Shared;
-using aspnetcore6.ntier.BLL.Interfaces.General;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.General;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.Services.DTO.General;
+using aspnetcore6.ntier.Services.DTO.Shared;
+using aspnetcore6.ntier.Services.Interfaces.General;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.General;
+using aspnetcore6.ntier.Models.Shared;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.BLL.Services.General
+namespace aspnetcore6.ntier.Services.Services.General
 {
     public class DepartmentService : IDepartmentService
     {

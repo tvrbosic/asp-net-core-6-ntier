@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="6.0.28" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.28">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,8 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspnetcore6.ntier.BLL\aspnetcore6.ntier.BLL.csproj" />
-    <ProjectReference Include="..\aspnetcore6.ntier.DAL\aspnetcore6.ntier.DAL.csproj" />
+    <ProjectReference Include="..\aspnetcore6.ntier.BLL\aspnetcore6.ntier.Services.csproj" />
   </ItemGroup>
 
 </Project>

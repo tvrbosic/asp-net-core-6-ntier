@@ -1,17 +1,17 @@
-﻿using aspnetcore6.ntier.DAL.Exceptions;
-using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.Abstract;
-using aspnetcore6.ntier.DAL.Models.Shared;
+﻿using aspnetcore6.ntier.DataAccess.Exceptions;
+using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.Models.Abstract;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace aspnetcore6.ntier.DAL.Repositories
+namespace aspnetcore6.ntier.DataAccess.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         private readonly ApiDbContext _context;
-        private readonly DbSet<TEntity> _dbSet;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public Repository(ApiDbContext context)
         {
@@ -20,23 +20,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
         }
 
         #region Public repository methods
-        // =======================================| IMPORTANT |======================================= //
-        /// <summary>
-        /// Exposes _dbSet so we could execute additional EF queries on it in case generic repository is already not providing desired functionality.
-        /// This approach removes possible situation in which we would create custom repository for specific case and attach it to UnitOfWork.
-        /// </summary>
-        /// <returns>Queryable DbSet of type TEntity.</returns>
-        public IQueryable<TEntity> Queryable()
-        {
-            return _dbSet;
-        }
-
-        public async Task<IEnumerable<TEntity>> GetAll()
+        public virtual async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public async Task<PaginatedData<TEntity>> GetAllPaginated(
+        public virtual async Task<PaginatedData<TEntity>> GetAllPaginated(
             int PageNumber,
             int PageSize,
             Expression<Func<TEntity, bool>>? searchTextPredicate,
@@ -50,14 +39,20 @@ namespace aspnetcore6.ntier.DAL.Repositories
                 filteredEntities = _dbSet.Where(searchTextPredicate).AsQueryable();
             }
 
+            // Check if TEntity is ApplicationUser and filter out user with ID 1 (SUPERUSER)
+            if (typeof(TEntity) == typeof(ApplicationUser))
+            {
+                filteredEntities = filteredEntities.Where(u => u.Id != 1);
+            }
+
             // Order
             filteredEntities = OrderByProperty(filteredEntities, orderByProperty, ascending);
 
             // Paginate
-            return await PaginatedData<TEntity>.ToPaginatedData(filteredEntities, PageNumber, PageSize);
+            return await PaginateData(filteredEntities, PageNumber, PageSize);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<IEnumerable<TEntity>> GetAllIncluding(params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsNoTracking().AsQueryable();
 
@@ -70,7 +65,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
         }
 
-        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
             IEnumerable<TEntity> result = await _dbSet.Where(predicate).ToListAsync();
             if (result == null)
@@ -81,7 +76,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<IEnumerable<TEntity>> FindIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsQueryable();
 
@@ -100,7 +95,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return result;
         }
 
-        public async Task<TEntity?> GetById(int id)
+        public virtual async Task<TEntity> GetById(int id)
         {
             TEntity? result = await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
 
@@ -112,7 +107,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return result;
         }
 
-        public async Task<TEntity?> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<TEntity> GetByIdIncluding(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             var entities = _dbSet.AsQueryable();
 
@@ -131,12 +126,12 @@ namespace aspnetcore6.ntier.DAL.Repositories
             return result;
         }
 
-        public async Task Add(TEntity entity)
+        public virtual async Task Add(TEntity entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities)
+        public virtual async Task AddRange(IEnumerable<TEntity> entities)
         {
             await _dbSet.AddRangeAsync(entities);
         }
@@ -147,12 +142,25 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
             if (existingEntity != null)
             {
-                _dbSet.Attach(entity);
-                _context.Entry(entity).State = EntityState.Modified;
+                // Check if the entity is already being tracked
+                var entry = _context.Entry(existingEntity);
+                if (entry.State == EntityState.Detached)
+                {
+                    // If it's detached, attach the provided entity
+                    _dbSet.Attach(entity);
+                }
+                else
+                {
+                    // If it's already being tracked, update its properties with the provided entity
+                    entry.CurrentValues.SetValues(entity);
+                }
+
+                // Set the state of the entity to Modified
+                entry.State = EntityState.Modified;
             }
             else
             {
-                throw new EntityNotFoundException($"Update operation failed for entitiy {typeof(TEntity)} with id: {entity.Id}");
+                throw new EntityNotFoundException($"Update operation failed for entity {typeof(TEntity)} with id: {entity.Id}");
             }
         }
 
@@ -172,7 +180,7 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Private repository methods
-        public IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
+        private IQueryable<TEntity> OrderByProperty(IQueryable<TEntity> entities, string orderByProperty = "Id", bool ascending = true)
         {
             // Check if the orderByProperty exists in the TEntity type
             var entityType = typeof(TEntity);
@@ -193,6 +201,14 @@ namespace aspnetcore6.ntier.DAL.Repositories
 
             // Return ordered 
             return ascending ? entities.OrderBy(lambda) : entities.OrderByDescending(lambda);
+        }
+
+        private async Task<PaginatedData<TEntity>> PaginateData(IQueryable<TEntity> source, int pageNumber, int pageSize)
+        {
+            var count = await source.CountAsync();
+            var entities = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PaginatedData<TEntity>(entities, count, pageNumber, pageSize);
         }
         #endregion
     }

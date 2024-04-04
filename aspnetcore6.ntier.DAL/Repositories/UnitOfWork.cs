@@ -1,8 +1,9 @@
-﻿using aspnetcore6.ntier.DAL.Interfaces.Repositories;
-using aspnetcore6.ntier.DAL.Models.AccessControl;
-using aspnetcore6.ntier.DAL.Models.General;
+﻿using aspnetcore6.ntier.DataAccess.Interfaces.Repositories;
+using aspnetcore6.ntier.DataAccess.Repositories.AccessControl;
+using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.General;
 
-namespace aspnetcore6.ntier.DAL.Repositories
+namespace aspnetcore6.ntier.DataAccess.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -13,18 +14,18 @@ namespace aspnetcore6.ntier.DAL.Repositories
         #endregion
 
         #region Access control entity registration
-        public IRepository<User> Users{ get; }
-        public IRepository<Role> Roles { get; }
         public IRepository<Permission> Permissions { get; }
+        public RoleRepository Roles { get; }
+        public IRepository<ApplicationUser> Users{ get; }
         #endregion
 
         public UnitOfWork(ApiDbContext context)
         {
             _context = context;
             Departments = new Repository<Department>(context);
-            Users = new Repository<User>(context);
-            Roles = new Repository<Role>(context);
             Permissions = new Repository<Permission>(context);
+            Roles = new RoleRepository(context);
+            Users = new UserRepository(context);
         }
 
         public async Task<int> CompleteAsync()
