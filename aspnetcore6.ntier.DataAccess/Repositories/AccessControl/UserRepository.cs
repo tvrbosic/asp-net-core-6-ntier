@@ -1,6 +1,7 @@
 ﻿using aspnetcore6.ntier.DataAccess.Exceptions;
 using aspnetcore6.ntier.DataAccess.Interfaces.Repositories.AccessControl;
 using aspnetcore6.ntier.Models.AccessControl;
+using aspnetcore6.ntier.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 using System.Security;
 
@@ -19,12 +20,12 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
                 .Include(u => u.Department)
                 .Include(u => u.RoleLinks)
                 .ThenInclude(pl => pl.Role)
-                .Where(u => u.Id != 1) // Filter out SUPERUSER
+                .Where(u => u.Id != SuperAdminConstants.Id) // Filter out SUPERUSER
                 .ToListAsync();
 
             if (users == null)
             {
-                throw new EntityNotFoundException($"No users found.");
+                throw new EntityNotFoundException("No users found.");
             }
 
             return users;
@@ -32,9 +33,9 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 
         public override async Task<ApplicationUser> GetById(int id)
         {
-            if (id == 1)
+            if (id == SuperAdminConstants.Id)
             {
-                throw new SecurityException("Access to user with ID 1 is forbidden!");
+                throw new SecurityException($"Access to user with ID {SuperAdminConstants.Id} is forbidden!");
             }
 
             ApplicationUser? user = await _dbSet
@@ -69,9 +70,9 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 
         public override async Task Update(ApplicationUser user)
         {
-            if (user.Id == 1)
+            if (user.Id == SuperAdminConstants.Id)
             {
-                throw new SecurityException("Update of user with ID 1 is forbidden!");
+                throw new SecurityException($"Update of user with ID {SuperAdminConstants.Id} is forbidden!");
             }
 
             await base.Update(user);
@@ -79,9 +80,9 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 
         public override async Task Delete(int id)
         {
-            if (id == 1)
+            if (id == SuperAdminConstants.Id)
             {
-                throw new SecurityException("Deletion of user with ID 1 is forbidden!");
+                throw new SecurityException($"Deletion of user with ID {SuperAdminConstants.Id} is forbidden!");
             }
 
             await base.Delete(id);

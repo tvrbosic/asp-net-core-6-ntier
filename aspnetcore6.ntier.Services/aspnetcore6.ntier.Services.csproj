@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspnetcore6.ntier.DAL\aspnetcore6.ntier.DataAccess.csproj" />
+    <ProjectReference Include="..\aspnetcore6.ntier.DataAccess\aspnetcore6.ntier.DataAccess.csproj" />
     <ProjectReference Include="..\aspnetcore6.ntier.Models\aspnetcore6.ntier.Models.csproj" />
   </ItemGroup>
 

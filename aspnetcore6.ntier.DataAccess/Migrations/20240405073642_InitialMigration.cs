@@ -329,9 +329,10 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                 column: "DeletedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Permissions_DepartmentId",
+                name: "IX_Permissions_DepartmentId_Name",
                 table: "Permissions",
-                column: "DepartmentId");
+                columns: new[] { "DepartmentId", "Name" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_UpdatedById",
@@ -352,6 +353,12 @@ namespace aspnetcore6.ntier.DataAccess.Migrations
                 name: "IX_Roles_DepartmentId",
                 table: "Roles",
                 column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Roles_Name",
+                table: "Roles",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_UpdatedById",

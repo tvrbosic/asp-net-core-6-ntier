@@ -1,4 +1,4 @@
-﻿namespace aspnetcore6.ntier.Services.Constants
+﻿namespace aspnetcore6.ntier.Models.Constants
 {
     public static class UserRoleConstants
     {

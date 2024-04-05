@@ -1,4 +1,4 @@
-﻿using aspnetcore6.ntier.Services.Constants;
+﻿using aspnetcore6.ntier.Models.Constants;
 using aspnetcore6.ntier.Services.Interfaces.AccessControl;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;

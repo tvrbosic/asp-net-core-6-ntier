@@ -14,6 +14,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Any;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using aspnetcore6.ntier.API.Policies.IsSuperAdmin;
+using aspnetcore6.ntier.API.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -69,16 +71,32 @@ builder.Services.AddSwaggerGen(c =>
 });
 #endregion
 
-#region Application services registration
+#region Repositories
 // =======================================| REPOSITORIES |======================================= //
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+#endregion
 
+#region Authorization policies
+// =======================================| AUTHORIZATION POLICIES |======================================= //
+builder.Services.AddScoped<IAuthorizationHandler, IsSuperAdminHandler>();
+
+// Register policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyNameConstants.IsSuperAdmin, policy => policy.Requirements.Add(new IsSuperAdminRequirement()));
+});
+
+#endregion
+
+#region Application services 
 // =======================================| SERVICES |======================================= //
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+#endregion
 
+#region Application utlitiy services
 // =======================================| UTILITY |======================================= //
 builder.Services.AddScoped<IDataSeedService, DataSeedService>();
 #endregion
