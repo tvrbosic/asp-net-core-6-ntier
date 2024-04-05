@@ -22,7 +22,7 @@ namespace aspnetcore6.ntier.DataAccess.Repositories.AccessControl
 
             if (roles == null)
             {
-                throw new EntityNotFoundException($"No roles found.");
+                throw new EntityNotFoundException("No roles found.");
             }
 
             return roles;

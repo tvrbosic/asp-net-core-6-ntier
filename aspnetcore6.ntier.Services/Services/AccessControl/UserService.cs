@@ -62,6 +62,13 @@ namespace aspnetcore6.ntier.Services.Services.AccessControl
             return userDTO;
         }
 
+        public async Task<UserDTO> GetUserByUsername(string username)
+        {
+            ApplicationUser user = await _unitOfWork.Users.GeByUsername(username);
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
+            return userDTO;
+        }
+
         public async Task<bool> AddUser(AddUserDTO userDTO)
         {
             ApplicationUser addUser = _mapper.Map<ApplicationUser>(userDTO);

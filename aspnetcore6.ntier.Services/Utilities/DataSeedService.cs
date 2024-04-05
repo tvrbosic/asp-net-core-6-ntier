@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using aspnetcore6.ntier.Models.Constants;
 
 namespace aspnetcore6.ntier.Services.Utilities
 {
@@ -52,7 +53,22 @@ namespace aspnetcore6.ntier.Services.Utilities
         {
             try
             {
+                // Create mock HTTP context for seed
+                CreateSeedHttpContext();
+
+                // Seed superuser
+                await SeedSuperuser();
+
+                // General entites
                 await SeedDepartments();
+
+                // Access control entites
+                await SeedPermissions();
+                await SeedRoles();
+                await SeedUsers();
+
+                // Seed developer users
+                await SeedDeveloperUsers();
             }
             catch (Exception ex)
             {
@@ -119,10 +135,10 @@ namespace aspnetcore6.ntier.Services.Utilities
                                                         VALUES (@UserName, @FirstName, @LastName, @Email, @DateCreated, @IsDeleted, @AuditKey)",
                         new[]
                         {
-                            new SqlParameter("@UserName", "SUPERUSER"),
-                            new SqlParameter("@FirstName", "SUPER"),
-                            new SqlParameter("@LastName", "USER"),
-                            new SqlParameter("@Email", "super.user@email.com"),
+                            new SqlParameter("@UserName", SuperAdminConstants.UserName),
+                            new SqlParameter("@FirstName", SuperAdminConstants.FirstName),
+                            new SqlParameter("@LastName", SuperAdminConstants.LastName),
+                            new SqlParameter("@Email", SuperAdminConstants.Email),
                             new SqlParameter("@DateCreated", DateTime.UtcNow),
                             new SqlParameter("@IsDeleted", false),
                             new SqlParameter("@AuditKey", Guid.NewGuid())
@@ -240,13 +256,14 @@ namespace aspnetcore6.ntier.Services.Utilities
                 Random random = new Random();
 
                 string[] roleNames = {
-                    "Super Administrator",
-                    "Administrator",
-                    "User",
-                    "Guest",
-                    "Administrator",
-                    "User",
-                    "Guest",
+                    UserRoleConstants.SuperAdministrator,
+                    UserRoleConstants.Administrator,
+                    UserRoleConstants.FirstDepartmentAdministrator,
+                    UserRoleConstants.FirstDepartmentUser,
+                    UserRoleConstants.FirstDepartmentGuest,
+                    UserRoleConstants.SecondDepartmentAdministrator,
+                    UserRoleConstants.SecondDepartmentUser,
+                    UserRoleConstants.SecondDepartmentGuest,
                 };
 
                 foreach (string roleName in roleNames)
@@ -362,23 +379,7 @@ namespace aspnetcore6.ntier.Services.Utilities
                         LastName = "Harris",
                         Email = "sarah.harris@example.com",
                         DepartmentId = 3
-                    },
-                    new ApplicationUser
-                    {
-                        UserName = "desktop-k9cdith\\vrbosic",
-                        FirstName = "Tomislav",
-                        LastName = "Vrbošić",
-                        Email = "tomislav.vrbosic@example.com",
-                        DepartmentId = 1
-                    },
-                    new ApplicationUser
-                    {
-                        UserName = "koncar-institut\\tvrbosic",
-                        FirstName = "Tomislav",
-                        LastName = "Vrbošić",
-                        Email = "tomislav.vrbosic@example.com",
-                        DepartmentId = 1
-                    }                   
+                    },           
                 };
 
                 foreach (var userToSeed in usersToSeed)
@@ -395,6 +396,52 @@ namespace aspnetcore6.ntier.Services.Utilities
                                 Role = roleToAdd
                             });
                         }
+                    }
+
+                    await _unitOfWork.Users.Add(userToSeed);
+                }
+
+                await _unitOfWork.CompleteAsync();
+            }
+        }
+
+        private async Task SeedDeveloperUsers()
+        {
+            IEnumerable<ApplicationUser> users = await _unitOfWork.Users.GetAll();
+            // Seed users only if there is just one user (Superuser)
+            if (users.Any() && users.Count() == 1)
+            {
+                List<ApplicationUser> usersToSeed = new List<ApplicationUser>()
+                {
+                    new ApplicationUser
+                    {
+                        UserName = "desktop-k9cdith\\vrbosic",
+                        FirstName = "Tomislav",
+                        LastName = "Vrbošić",
+                        Email = "tomislav.vrbosic@example.com",
+                        DepartmentId = 1
+                    },
+                    new ApplicationUser
+                    {
+                        UserName = "koncar-institut\\tvrbosic",
+                        FirstName = "Tomislav",
+                        LastName = "Vrbošić",
+                        Email = "tomislav.vrbosic@example.com",
+                        DepartmentId = 1
+                    }
+                };
+
+                foreach (var userToSeed in usersToSeed)
+                {
+                    // Attach super administrator role to developer
+                    Role? roleToAdd = await _unitOfWork.Roles.GetById(1);
+                    if (roleToAdd != null)
+                    {
+                        userToSeed.RoleLinks.Add(new RoleUserLink
+                        {
+                            User = userToSeed,
+                            Role = roleToAdd
+                        });
                     }
 
                     await _unitOfWork.Users.Add(userToSeed);
