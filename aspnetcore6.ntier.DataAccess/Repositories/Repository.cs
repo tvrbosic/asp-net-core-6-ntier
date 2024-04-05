@@ -68,11 +68,6 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
         public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
             IEnumerable<TEntity> result = await _dbSet.Where(predicate).ToListAsync();
-            if (result == null)
-            {
-                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
-            }
-
             return result;
         }
 
@@ -86,11 +81,6 @@ namespace aspnetcore6.ntier.DataAccess.Repositories
             }
 
             IEnumerable<TEntity> result = await entities.Where(predicate).ToListAsync();
-
-            if (result == null)
-            {
-                throw new EntityNotFoundException($"Find operation failed for entitiy {typeof(TEntity)}");
-            }
 
             return result;
         }

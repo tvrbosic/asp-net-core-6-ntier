@@ -26,11 +26,10 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
-	<Folder Include="Policies\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspnetcore6.ntier.BLL\aspnetcore6.ntier.Services.csproj" />
+    <ProjectReference Include="..\aspnetcore6.ntier.Services\aspnetcore6.ntier.Services.csproj" />
   </ItemGroup>
 
 </Project>

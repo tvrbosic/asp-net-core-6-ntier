@@ -76,6 +76,8 @@ public class ApiDbContext : DbContext
                 .HasForeignKey(r => r.DepartmentId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(r => r.Name).IsUnique();
         });
 
         modelBuilder.Entity<Permission>(entity =>
@@ -85,6 +87,8 @@ public class ApiDbContext : DbContext
                 .WithMany(d => d.Permissions)
                 .HasForeignKey(p => p.DepartmentId)
                 .IsRequired();
+
+            entity.HasIndex(r => new { r.DepartmentId, r.Name }).IsUnique();
         });
 
         modelBuilder.Entity<PermissionRoleLink>(entity =>
